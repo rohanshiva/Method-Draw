@@ -13,8 +13,6 @@ MD.Editor = function(){
       if(!ok) return;
       state.set("canvasMode", "select")
       svgCanvas.clear();
-      editor.save_name = undefined;
-      document.getElementById("save_name").innerText = "untitled.svg";
       svgCanvas.setResolution(dims[0], dims[1]);
       editor.canvas.update();
       editor.zoom.reset();
@@ -25,40 +23,6 @@ MD.Editor = function(){
     });
   }
 
-  function cloudSave(){
-    if(editor.save_name) {
-      svgCanvas.clearSelection();
-      const str = svgCanvas.svgCanvasToString();
-      const blob = new Blob([str], {type:"image/svg+xml"})
-      const file = new File([blob], editor.save_name, {type: "image/svg_xml"})
-      const formData = new FormData();
-      formData.append("file", file)
-      formData.append("name", editor.save_name);
-      _api.saveDrawing(formData).then(res=> {
-        editor.modal.save.close()
-        document.getElementById("save_name").innerText = editor.save_name;
-      });
-    } else {
-      editor.modal.save.open();
-    }
-  }
-
-  function open() {
-    editor.modal.open.open();
-  }
-
-  function share() {
-    editor.modal.share.open();
-  }
-  function del(){
-    if(editor.save_name) {
-      _api.deleteDrawing(editor.save_name).then(res=> {
-        this.clear()
-      })
-    }else {
-      this.clear()
-    }
-  }
   function save(){
     _self.menu.flash($('#file_menu'));
     svgCanvas.save();
@@ -385,14 +349,9 @@ MD.Editor = function(){
   this.switchPaint = switchPaint;
   this.focusPaint = focusPaint;
   this.save = save;
-  this.share = share;
-  this.open = open;
-  this.del = del;
-  this.cloudSave = cloudSave;
   this.undo = undo;
   this.redo = redo;
   this.clear = clear;
-  this.save_name = undefined;
   this.duplicateSelected = duplicateSelected;
   this.deleteSelected = deleteSelected;
   this.cutSelected = cutSelected;

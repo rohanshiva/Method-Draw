@@ -11,23 +11,23 @@
   <meta name="description" content="Method Draw is an open source SVG editor for the web, you can use it online without signing up.">
 
   <!-- build:css all.css -->
-  <link rel="stylesheet" href="css/base.css" type="text/css"/>
-  <link rel="stylesheet" href="css/jpicker.css" type="text/css"/>
-  <link rel="stylesheet" href="css/jgraduate.css" type="text/css"/>
-  <link rel="stylesheet" href="css/fonts.css" type="text/css"/>
-  <link rel="stylesheet" href="css/dropdown.css" type="text/css"/>
-  <link rel="stylesheet" href="css/draginput.css" type="text/css"/>
-  <link rel="stylesheet" href="css/menu.css" type="text/css"/>
-  <link rel="stylesheet" href="css/rulers.css" type="text/css"/>
-  <link rel="stylesheet" href="css/palette.css" type="text/css"/>
-  <link rel="stylesheet" href="css/color-tool.css" type="text/css"/>
-  <link rel="stylesheet" href="css/context-menu.css" type="text/css"/>
-  <link rel="stylesheet" href="css/shapelib.css" type="text/css"/>
-  <link rel="stylesheet" href="css/modal.css" type="text/css"/>
-  <link rel="stylesheet" href="css/source.css" type="text/css"/>
-  <link rel="stylesheet" href="css/keyboard.css" type="text/css"/>
-  <link rel="stylesheet" href="css/dialog.css" type="text/css"/>
-  <link rel="stylesheet" href="css/method-draw.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/base.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/jpicker.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/jgraduate.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/fonts.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/dropdown.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/draginput.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/menu.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/rulers.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/palette.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/color-tool.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/context-menu.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/shapelib.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/modal.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/source.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/keyboard.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/dialog.css" type="text/css"/>
+  <link rel="stylesheet" href="../css/method-draw.css" type="text/css"/>
   <!-- endbuild -->
 </head>
 <body>
@@ -66,19 +66,16 @@
     <div class="menu_title">File</div>
     <div class="menu_list" id="file_menu"> 
       <div data-action="clear" id="tool_clear" class="menu_item">New Document</div>
+      
       <div id="tool_open" class="menu_item">
-        Import SVG... <span class="shortcut">⌘O</span></div>
+        Open SVG... <span class="shortcut">⌘O</span></div>
       <input type="file" accept="image/svg+xml" />
       
       <div id="tool_import" class="menu_item">
         Place Image... <span class="shortcut">⌘K</span></div>
         <input type="file" accept="image/*" />
-      <div data-action="cloudSave" id="tool_csave" class="menu_item">Save to Deta... <span class="shortcut">⌘S</span></div>
-      <div data-action = "del" id="tool_cdelete" class="menu_item">Delete Drawing </div>
-      <div data-action = "open" id="tool_copen" class="menu_item">Open </div>
-      <div data-action="save" id="tool_save" class="menu_item">Export Image... </div>
+      <div data-action="save" id="tool_save" class="menu_item">Export Image... <span class="shortcut">⌘S</span></div>
       <div data-action="export" id="tool_export" class="menu_item">Export as PNG</div>
-      <div data-action = "share" id="tool_share" class="menu_item">Share </div>
     </div>
   </div>
 
@@ -120,10 +117,6 @@
         <div class="separator"></div>
         <div class="menu_item" id="tool_source" data-action="source">Source... <span class="shortcut">⌘U</span></div>
     </div>
-  </div>
-
-  <div class="menu">
-    <strong id="save_name" class="menu_title">untitled.svg</strong>
   </div>
 </div>
 
@@ -711,14 +704,14 @@
 </div>
 
 <!-- build:js all.js -->
-  <script type="text/javascript" src="js/lib/jquery-3.5.1.min.js"></script>
-  <script type="text/javascript" src="js/lib/pathseg.js"></script>
-  <script type="text/javascript" src="js/lib/jquery.hotkeys.min.js"></script>
-  <script type="text/javascript" src="js/lib/jquery.jgraduate.js"></script>
-  <script type="text/javascript" src="js/lib/jquery.contextMenu.js"></script>
-  <script type="text/javascript" src="js/lib/jquery-ui-1.8.17.custom.min.js"></script>
-  <script type="text/javascript" src="js/jquery.attr.js"></script>
-  <script type="text/javascript" src="js/lib/jquery-draginput.js"></script>
+  <script type="text/javascript" src="../js/lib/jquery-3.5.1.min.js"></script>
+  <script type="text/javascript" src="../js/lib/pathseg.js"></script>
+  <script type="text/javascript" src="../js/lib/jquery.hotkeys.min.js"></script>
+  <script type="text/javascript" src="../js/lib/jquery.jgraduate.js"></script>
+  <script type="text/javascript" src="../js/lib/jquery.contextMenu.js"></script>
+  <script type="text/javascript" src="../js/lib/jquery-ui-1.8.17.custom.min.js"></script>
+  <script type="text/javascript" src="../js/jquery.attr.js"></script>
+  <script type="text/javascript" src="../js/lib/jquery-draginput.js"></script>
   <script type="text/javascript" src="js/utils.js"></script>
   <script type="text/javascript" src="js/dao.js"></script>
   <script type="text/javascript" src="js/state.js"></script>
@@ -753,15 +746,14 @@
   <script type="text/javascript" src="js/Shapelib.js"></script>
   <script type="text/javascript" src="js/fonts.js"></script>
   <script type="text/javascript" src="js/dialog.js"></script>
-  <script type="text/javascript" src="js/lib/contextmenu.js"></script>
-  <script type="text/javascript" src="js/lib/jpicker.min.js"></script>
-  <script type="text/javascript" src="js/lib/mousewheel.js"></script>
+  <script type="text/javascript" src="../js/lib/contextmenu.js"></script>
+  <script type="text/javascript" src="../js/lib/jpicker.min.js"></script>
+  <script type="text/javascript" src="../js/lib/mousewheel.js"></script>
   <script type="text/javascript" src="js/eyedropper.js"></script>
   <!--<script type="text/javascript" src="js/grid.js"></script>-->
-  <script type="text/javascript" src="js/api.js"></script>
-  <script type="text/javascript" src="js/lib/requestanimationframe.js"></script>
-  <script type="text/javascript" src="js/lib/taphold.js"></script>
-  <script type="text/javascript" src="js/lib/filesaver.js"></script>
+  <script type="text/javascript" src="../js/lib/requestanimationframe.js"></script>
+  <script type="text/javascript" src="../js/lib/taphold.js"></script>
+  <script type="text/javascript" src="../js/lib/filesaver.js"></script>
   <script type="text/javascript" src="js/paste.js"></script>
   <script type="text/javascript" src="js/start.js"></script>
 

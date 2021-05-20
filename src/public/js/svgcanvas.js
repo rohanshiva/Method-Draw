@@ -5398,12 +5398,6 @@ this.save = function() {
   saveAs(blob, "method-draw-image.svg", dropAutoBOM);
 };
 
-// Function: csave
-// Stores the svg in cloud
-this.csave = function() {
-  
-}
-
 // Function: rasterExport
 // Generates a PNG Data URL based on the current image, then calls "exported" 
 // with an object including the string and any issues found

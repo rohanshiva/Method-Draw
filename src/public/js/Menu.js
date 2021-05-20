@@ -66,8 +66,6 @@ MD.Menu = function(){
     }
   });
 
-
-
   $("body").on('mousedown', close);
 
   this.flash = flash;
