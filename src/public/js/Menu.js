@@ -68,12 +68,6 @@ MD.Menu = function(){
 
   $("body").on('mousedown', close);
 
-  document.getElementById("share").addEventListener('click', function() {
-     if(editor.save_name) {
-      editor.share()
-    }
-  });
-
   this.flash = flash;
 
 }

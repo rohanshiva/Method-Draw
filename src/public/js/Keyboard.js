@@ -14,7 +14,7 @@ MD.Keyboard = function(){
     "x":       { name: "Focus fill/stroke",  cb: ()=> editor.focusPaint()}, 
     "shift_x": { name: "Switch fill/stroke",  cb: ()=> editor.switchPaint()},  
     "alt":   { name: false,                 cb: ()=> $("#workarea").toggleClass("out", state.get("canvasMode") === "zoom" )},  
-    "cmd_s": { name: "Save SVG File",       cb: ()=> editor.cloudSaveAs()},
+    "cmd_s": { name: "Save SVG File",       cb: ()=> editor.save()},
     "cmd_z": { name: "Undo",                cb: ()=> editor.undo()},
     "cmd_y": { name: "Redo",                cb: ()=> editor.redo()},
     "cmd_shift_z": { name: "Redo",          cb: ()=> editor.redo()},
