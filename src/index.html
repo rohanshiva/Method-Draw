@@ -29,11 +29,17 @@
   <link rel="stylesheet" href="css/keyboard.css" type="text/css"/>
   <link rel="stylesheet" href="css/dialog.css" type="text/css"/>
   <link rel="stylesheet" href="css/method-draw.css" type="text/css"/>
+  <link rel="stylesheet" href="css/app.css" type="text/css"/>
+  <link rel="stylesheet" href="css/tools.css" type="text/css"/>
+  <link rel="stylesheet" href="css/button.css" type="text/css"/>
+  <link rel="stylesheet" href="css/select.css" type="text/css"/>
+  <link rel="stylesheet" href="css/panel.css" type="text/css"/>
+  <link rel="stylesheet" href="css/align_buttons.css" type="text/css"/>
   <!-- endbuild -->
 </head>
 <body>
 
-<div id="svg_editor">
+<div id="method-draw" class="app">
 <div id="rulers">
   <div id="ruler_corner"></div>
   <div id="ruler_x"></div>
@@ -182,7 +188,7 @@
         </optgroup>
 
         <optgroup label="Presentation">
-          <option value="920x1080">16:9 (920 × 1080)</option>
+          <option value="1920x1080">16:9 (1920 × 1080)</option>
           <option value="1024x768">4:3 (1024 × 768)</option>
         </optgroup>
         
@@ -350,7 +356,7 @@
       <input id="text_y" class="attr_changer" data-title="Change text y coordinate" data-attr="y" pattern="[0-9]*" />
       <span>Y</span>
     </label>
-    <div class="toolset draginput select twocol" id="tool_font_family">
+    <div class="toolset draginput twocol" id="tool_font_family">
         <!-- Font family -->
       <span>Font</span>
       <div id="preview_font" style="font-family: sans-serif">sans-serif</div>
@@ -358,8 +364,8 @@
       <input id="font_family" data-title="Change Font Family" size="12" type="hidden" />
       <select id="font_family_dropdown">
       </select>
-      <div class="tool_button" id="tool_bold" data-title="Bold Text [B]">B</div>
-      <div class="tool_button" id="tool_italic" data-title="Italic Text [I]">i</div>
+      <div id="tool_bold" data-title="Bold Text [B]">B</div>
+      <div id="tool_italic" data-title="Italic Text [I]">i</div>
     </div>
 
     <label id="tool_font_size" data-title="Change Font Size">
@@ -373,7 +379,7 @@
   </div>
   
   <div id="use_panel" class="context_panel clearfix">
-    <div class="tool_button clearfix" id="tool_unlink_use" data-title="Break link to reference element (make unique)">Break link reference</div>
+    <div class="button" id="tool_unlink_use" data-title="Break link to reference element (make unique)">Break link reference</div>
   </div>
   
   <div id="g_panel" class="context_panel clearfix">
@@ -410,18 +416,11 @@
       <label id="seg_type_label">Straight</label>
     </div>
     
-    <!--
-    <label class="draginput checkbox" data-title="Link Control Points">
-      <span>Linked Control Points</span>
-      <div class="push_bottom"><input type="checkbox" id="tool_node_link" checked="checked" /></div>
-    </label>
-  -->
-    
-    <div class="clearfix"></div>
-    <div class="tool_button" id="tool_node_clone" title="Adds a node">Add Node</div>
-    <div class="tool_button" id="tool_node_delete" title="Delete Node">Delete Node</div>
-    <div class="tool_button" id="tool_openclose_path" title="Open/close sub-path">Open Path</div>
-    <!--<div class="tool_button" id="tool_add_subpath" title="Add sub-path"></div>-->
+    <div class="button-container clearfix">
+      <div class="button full" id="tool_node_clone" title="Adds a node">Add Node</div>
+      <div class="button full" id="tool_node_delete" title="Delete Node">Delete Node</div>
+      <div class="button full" id="tool_openclose_path" title="Open/close sub-path">Open Path</div>
+    </div>
   </div>
   
   <!-- Buttons when a single element is selected -->
@@ -458,32 +457,32 @@
       <div class="toolset align_buttons" id="tool_position">
           <label>
             <div class="col last clear" id="position_opts">
-              <div class="draginput_cell" id="tool_posleft" title="Align Left" data-align="left">
+              <div class="align_button" id="tool_posleft" title="Align Left" data-align="left">
                 <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
                   <path d="M 2 1 L 2 5 L 14 5 L 14 11 L 2 11 L 2 16 L 20 16 L 20 22 L 2 22 L 2 26 L 1 26 L 1 1 L 2 1 Z" />
                 </svg>
               </div>
-              <div class="draginput_cell" id="tool_poscenter" title="Align Center" data-align="center">
+              <div class="align_button" id="tool_poscenter" title="Align Center" data-align="center">
                 <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
                   <path d="M 13 1 L 14 1 L 14 6 L 22 6 L 22 12 L 14 12 L 14 15 L 19 15 L 19 21 L 14 21 L 14 26 L 13 26 L 13 21 L 8 21 L 8 15 L 13 15 L 13 12 L 5 12 L 5 6 L 13 6 L 13 1 Z" />
                 </svg>
               </div>
-              <div class="draginput_cell" id="tool_posright" title="Align Right" data-align="right">
+              <div class="align_button" id="tool_posright" title="Align Right" data-align="right">
                   <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
                     <path d="M 25 1 L 25 5 L 13 5 L 13 11 L 25 11 L 25 16 L 7 16 L 7 22 L 25 22 L 25 26 L 26 26 L 26 1 L 25 1 Z"/>
                   </svg>
               </div>
-              <div class="draginput_cell" id="tool_postop" title="Align Top" data-align="top">
+              <div class="align_button" id="tool_postop" title="Align Top" data-align="top">
                   <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
                     <path d="M 1 2 L 5 2 L 5 14 L 11 14 L 11 2 L 16 2 L 16 20 L 22 20 L 22 2 L 26 2 L 26 1 L 1 1 L 1 2 Z"/>
                   </svg>
               </div>
-              <div class="draginput_cell" id="tool_posmiddle" title="Align Middle" data-align="middle">
+              <div class="align_button" id="tool_posmiddle" title="Align Middle" data-align="middle">
                 <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
                   <path d="M 26 13 L 26 14 L 21 14 L 21 22 L 15 22 L 15 14 L 12 14 L 12 19 L 6 19 L 6 14 L 1 14 L 1 13 L 6 13 L 6 8 L 12 8 L 12 13 L 15 13 L 15 5 L 21 5 L 21 13 L 26 13 Z"/>
                 </svg>
               </div>
-              <div class="draginput_cell" id="tool_posbottom" title="Align Bottom" data-align="bottom">
+              <div class="align_button" id="tool_posbottom" title="Align Bottom" data-align="bottom">
                 <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
                   <path d="M 1 25 L 5 25 L 5 13 L 11 13 L 11 25 L 16 25 L 16 7 L 22 7 L 22 25 L 26 25 L 26 26 L 1 26 L 1 25"/>
                 </svg>
@@ -498,41 +497,42 @@
   <div id="multiselected_panel" class="context_panel clearfix">
     <h4 class="hidable">Multiple Elements</h4>
     
-    <div class="toolset align_buttons" style="position: relative">
-      <label id="tool_align_relative" style="margin-top: 10px;"> 
-        <select id="align_relative_to" title="Align relative to ...">
-        <option id="selected_objects" value="selected">Align to objects</option>
-        <option id="page" value="page">Align to page</option>
-        </select>
+    <div class="toolset align_buttons">
+      <label id="tool_align_relative">
+        <div class="select">
+          <select id="align_relative_to" title="Align relative to ..." class="select_tool">
+          <option id="selected_objects" value="selected">Align to objects</option>
+          <option id="page" value="page">Align to page</option>
+          </select>
+        </div>
       </label>
-      <h4>.</h4>
-        <div class="col last clear">
-          <div class="draginput_cell" id="tool_alignleft" title="Align Left" data-align="left">
+      <div class="col last clear">
+          <div class="align_button" id="tool_alignleft" title="Align Left" data-align="left">
             <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
               <path d="M 2 1 L 2 5 L 14 5 L 14 11 L 2 11 L 2 16 L 20 16 L 20 22 L 2 22 L 2 26 L 1 26 L 1 1 L 2 1 Z" />
             </svg>
           </div>
-          <div class="draginput_cell" id="tool_aligncenter" title="Align Center" data-align="center">
+          <div class="align_button" id="tool_aligncenter" title="Align Center" data-align="center">
             <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
               <path d="M 13 1 L 14 1 L 14 6 L 22 6 L 22 12 L 14 12 L 14 15 L 19 15 L 19 21 L 14 21 L 14 26 L 13 26 L 13 21 L 8 21 L 8 15 L 13 15 L 13 12 L 5 12 L 5 6 L 13 6 L 13 1 Z" />
             </svg>
           </div>
-          <div class="draginput_cell" id="tool_alignright" title="Align Right" data-align="right">
+          <div class="align_button" id="tool_alignright" title="Align Right" data-align="right">
             <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
               <path d="M 25 1 L 25 5 L 13 5 L 13 11 L 25 11 L 25 16 L 7 16 L 7 22 L 25 22 L 25 26 L 26 26 L 26 1 L 25 1 Z"/>
             </svg>
           </div>
-          <div class="draginput_cell" id="tool_aligntop" title="Align Top"  data-align="top">
+          <div class="align_button" id="tool_aligntop" title="Align Top"  data-align="top">
             <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
               <path d="M 1 2 L 5 2 L 5 14 L 11 14 L 11 2 L 16 2 L 16 20 L 22 20 L 22 2 L 26 2 L 26 1 L 1 1 L 1 2 Z"/>
             </svg>
           </div>
-          <div class="draginput_cell" id="tool_alignmiddle" title="Align Middle" data-align="middle">
+          <div class="align_button" id="tool_alignmiddle" title="Align Middle" data-align="middle">
             <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
               <path d="M 26 13 L 26 14 L 21 14 L 21 22 L 15 22 L 15 14 L 12 14 L 12 19 L 6 19 L 6 14 L 1 14 L 1 13 L 6 13 L 6 8 L 12 8 L 12 13 L 15 13 L 15 5 L 21 5 L 21 13 L 26 13 Z"/>
             </svg>
           </div>
-          <div class="draginput_cell" id="tool_alignbottom" title="Align Bottom"  data-align="bottom">
+          <div class="align_button" id="tool_alignbottom" title="Align Bottom"  data-align="bottom">
             <svg viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg" width="27" height="27">
               <path d="M 1 25 L 5 25 L 5 13 L 11 13 L 11 25 L 16 25 L 16 7 L 22 7 L 22 25 L 26 25 L 26 26 L 1 26 L 1 25"/>
             </svg>

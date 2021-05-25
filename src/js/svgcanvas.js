@@ -4655,6 +4655,7 @@ var pathActions = canvas.pathActions = function() {
       svgedit.path.path.init().addPtsToSelection(nums);
 
       svgedit.path.path.endChanges("Clone path node(s)");
+      return svgedit.path.path;
     },
     opencloseSubPath: function() {
       var sel_pts = svgedit.path.path.selected_pts;
@@ -5534,7 +5535,6 @@ var uniquifyElems = this.uniquifyElems = function(g) {
       
       // assign element its new id
       elem.id = newid;
-      
       // remap all url() attributes
       var attrs = ids[oldid]["attrs"];
       var j = attrs.length;
@@ -5542,9 +5542,9 @@ var uniquifyElems = this.uniquifyElems = function(g) {
         var attr = attrs[j];
         attr.ownerElement.setAttribute(attr.name, "url(#" + newid + ")");
       }
-      
       // remap all href attributes
       var hreffers = ids[oldid]["hrefs"];
+      console.log(hreffers)
       var k = hreffers.length;
       while (k--) {
         var hreffer = hreffers[k];
@@ -5786,9 +5786,6 @@ this.setSvgString = function(xmlString) {
   try {
     // convert string into XML document
     var newDoc = svgedit.utilities.text2xml(xmlString);
-    //var parser = new DOMParser();
-    //var newDoc = parser.parseFromString(stringContainingXMLSource, "image/svg+xml");
-
     this.prepareSvg(newDoc);
 
     var batchCmd = new BatchCommand("Change Source");
@@ -6058,16 +6055,10 @@ this.importSvgString = function(xmlString) {
       var canvasw = +svgcontent.getAttribute("width"),
         canvash = +svgcontent.getAttribute("height");
       // imported content should be 1/3 of the canvas on its largest dimension
-      
-      if (innerh > innerw) {
-        var ts = "scale(" + (canvash/3)/vb[3] + ")";
-      }
-      else {
-        var ts = "scale(" + (canvash/3)/vb[2] + ")";
-      }
+
       
       // Hack to make recalculateDimensions understand how to scale
-      ts = "translate(0) " + ts + " translate(0)";
+      var ts = "translate(0)";
       
       var symbol = svgdoc.createElementNS(svgns, "symbol");
       var defs = findDefs();

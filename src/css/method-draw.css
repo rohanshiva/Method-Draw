@@ -16,8 +16,6 @@ body {
 ::selection {background: #000; color: #fff; /* Safari */}
 ::-moz-selection {background: #000; color: #fff; /* Firefox */}
 
-
-
 html, body {
   overscroll-behavior-x: none;
   overflow: hidden;
@@ -45,123 +43,22 @@ html, body {
   background: var(--z1);
 }
 
- #svgroot {
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  display: block;
-}
-
-#svg_editor {
-  background: var(--z1);
-}
-
-#svgcanvas {
-  background-color: var(--z1);
-  width: 800px;
-  height: 600px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  background: var(--z2);
-}
-
-
-#use_panel .tool_button,
-#path_node_panel .tool_button {
-  color: #999;
-  border: solid #3F3F3C 1px;
-  border-radius: 3px;
-  background: transparent;
-  margin-top: 10px;
-  width: 90%;
-  line-height: 40px;
-}
-
-#use_panel .tool_button:hover,
-#path_node_panel .tool_button:hover {
-  border-color: #666;
-  color: #aaa;
-}
-
-#use_panel .tool_button {
-  padding-left: 10px;
-  margin-bottom: 10px;
-  width: 124px;
-}
-
- #path_node_panel .tool_button img,  #path_node_panel .tool_button svg {
-  position: absolute;
-  left: 5px;
-  top: 3px;
-}
-
-
-
- #linkLabel > svg {
-  height: 20px;
-  padding-top: 4px;
-}
-
- #workarea {
-  display: flex;
-  position:absolute;
-  top: 30px;
-  left: 50px;
-  bottom: 40px;
-  right: 175px;
-  background-color: var(--z2);
-  overflow: auto;
-  align-items: center;
-  justify-content: center;
-  transition: transform 500ms cubic-bezier(0.13,0.66,0.24,0.92);
-}
-
- #main_icon span {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: block;
-  z-index: 2;
-}
-
- #panels {
-  position: absolute;
-  width: 160px;
-  height: 100%;
-  background: var(--z1);
-  right: 0;
-  top: 20px;
-  border-bottom: none;
-  overflow: visible;
-  padding: 0 0 0 15px;
-}
-
-.touch  #panels {
-  top: 30px;
-}
-
- label {
-  display: block;
-  color: #999;
-  white-space: nowrap;
-}
 
 div#font-selector { 
-    width:140px; 
-    height:300px; 
-    overflow:auto;  
-    margin:0 auto; 
-    position:absolute; 
-    top:27px;
-    right:0;
-    border:1px solid black; 
-    padding:10px; 
-    display:none; 
-    background-color:white;
-    z-index: 10;
-    border-radius: 3px;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.7);
+  width:140px; 
+  height:300px; 
+  overflow:auto;  
+  margin:0 auto; 
+  position:absolute; 
+  top:27px;
+  right:0;
+  border:1px solid black; 
+  padding:10px; 
+  display:none; 
+  background-color:white;
+  z-index: 10;
+  border-radius: 3px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.7);
 }
 
 div#font-selector img {
@@ -244,17 +141,6 @@ button:focus {
   background-color: var(--b7);
  }
 
- #tools_left {
-  position: absolute;
-  border-right: none;
-  width: var(--x12);
-  top: 30px;
-  bottom: 0;
-  left: 0;
-  background: var(--z1);
-  z-index: 4;
-}
-
 #svgcontent {
   overflow: hidden;
 }
@@ -274,10 +160,6 @@ button:focus {
 .wireframe #svgcontent text {
   fill: #000;
   stroke: none;
-}
-
-.context_panel {
-  display: none;
 }
 
 #canvas_panel {
@@ -313,38 +195,6 @@ button:focus {
 
  #cur_context_panel a:hover {
   text-decoration: underline;
-}
-
-.tool_button {
-  height: var(--x12);
-  width: var(--x12);
-  cursor: pointer;
-  line-height: 60px;
-  text-align: center;
-}
-
-.tool_button svg {
-  vertical-align: center;
-  fill: var(--z5);
-}
-
-.tool_button:hover svg {
-  fill: var(--z10);
-}
-
-.tool_button.current {
-  background-color: var(--z0);
-}
-
-.tool_button.current svg {
-  fill: var(--d15);
-}
-
-.tool_button.disabled svg {
-  background-color: #aaa;
-  cursor: not-allowed;
-  fill: var(--z3);
-  pointer-events: none;
 }
 
 #main_menu li#tool_open,  #main_menu li#tool_import {
@@ -410,29 +260,8 @@ input[type=file] {
   background-color: var(--z1);
 }
 
-
- #panels h4 {
-  color: var(--z15);
-  font-weight: normal;
-  margin: 0;
-  padding: 10px 0 5px 0;
-}
-
-#panels .dropdown .icon_label {
-  border: 1px solid transparent;
-  height: auto;
-}
-
-#panels.multiselected #align_tools {
-  display: none;
-}
-
-#panels.multiselected #multiselected_panel {
-  display: block !important;
-}
-
-#panels.multiselected #multiselected_panel .hidable {
-  display: none;
+.toolset {
+  position: relative;
 }
 
 .draginput.text-input input, 
@@ -446,39 +275,10 @@ input[type=file] {
   text-indent: 8px;
 }
 
-.draginput_cell {
-  float: left;
-  height: 26px;
-  height: 26px;
-  border: solid var(--z2) 10px;
-  outline: solid var(--z1) 1px;
-  background-color: var(--z2);
-  cursor: pointer;
-  position: relative;
-}
-
-.draginput_cell svg {
-  fill: #999;
-}
-
-.draginput_cell:hover svg {
-  fill: #fff;
-}
-
 .draginput.textcontent {
   position: absolute;
   opacity: 0;
   z-index: 0;
-}
-
- .align_buttons  .draginput_cell:nth-child(1) {border-radius: 3px 0 0 0;}
- .align_buttons  .draginput_cell:nth-child(3) {border-radius: 0 3px 0 0;}
- .align_buttons  .draginput_cell:nth-child(4) {border-radius: 0 0 0 3px;}
- .align_buttons  .draginput_cell:nth-child(6) {border-radius: 0 0 3px 0;}
-
-.align_buttons .push_button {
-  display: block;
-  float: left;
 }
 
  ul li.current {
@@ -714,7 +514,6 @@ input[readonly=readonly]:focus {
   display: block;
 }
 
-
 #tool_angle_indicator {
   width:         50px;
   height:        50px;
@@ -742,17 +541,4 @@ input[readonly=readonly]:focus {
 
 .stroke_tool .caret {
   top: 60%;
-}
-
-#tool_align_relative {
-  position: absolute;
-  top: -5px;
-  left: 0;
-  right: 20px;
-  display: block;
-}
-
-#tool_align_relative select {
-  width: 100%;
-  display: block;
 }

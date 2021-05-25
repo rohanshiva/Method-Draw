@@ -218,10 +218,6 @@ svgedit.utilities.text2xml = function(sXML) {
     sXML = sXML.replace(/<(\/?)svg:/g, '<$1').replace('xmlns:svg', 'xmlns');
   }
 
-  if(sXML.indexOf('xlink:href') >= 0) {
-    sXML = sXML.split("xlink:href").join("href");
-  }
-
   var out;
   try{
     var dXML = (window.DOMParser)?new DOMParser():new ActiveXObject("Microsoft.XMLDOM");
@@ -319,13 +315,14 @@ svgedit.utilities.getUrlFromAttr = function(attrVal) {
 // Function: svgedit.utilities.getHref
 // Returns the given element's xlink:href value
 svgedit.utilities.getHref = function(elem) {
-  if (elem) return elem.getAttributeNS(XLINKNS, "href");
+  if (elem) return elem.getAttributeNS(XLINKNS, "href") || elem.getAttribute("href");
 }
 
 // Function: svgedit.utilities.setHref
 // Sets the given element's xlink:href value
 svgedit.utilities.setHref = function(elem, val) {
   elem.setAttributeNS(XLINKNS, "xlink:href", val);
+  elem.setAttribute("href", val);
 }
 
 // Function: findDefs
