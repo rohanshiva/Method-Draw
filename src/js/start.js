@@ -25,10 +25,10 @@ editor.modal = {
           </div>
         </div>
     </div>`,
-    js: function(el){
+    js: function (el) {
       el.children[0].classList.add("modal-item-source");
-      el.querySelector("#tool_source_save").addEventListener("click", function(){
-        var saveChanges = function() {
+      el.querySelector("#tool_source_save").addEventListener("click", function () {
+        var saveChanges = function () {
           svgCanvas.clearSelection();
           $('#svg_source_textarea').blur();
           editor.zoom.multiply(1);
@@ -39,17 +39,72 @@ editor.modal = {
         }
 
         if (!svgCanvas.setSvgString($('#svg_source_textarea').val())) {
-          $.confirm("There were parsing errors in your SVG source.\nRevert back to original SVG source?", function(ok) {
-            if(!ok) return false;
+          $.confirm("There were parsing errors in your SVG source.\nRevert back to original SVG source?", function (ok) {
+            if (!ok) return false;
             saveChanges();
           });
         } else {
           saveChanges();
-        } 
+        }
       })
-      el.querySelector("#tool_source_cancel").addEventListener("click", function(){
+      el.querySelector("#tool_source_cancel").addEventListener("click", function () {
         editor.modal.source.close();
       });
+    }
+  }),
+  // deta modals
+  cloudSave: new MD.Modal({
+    html: `<h3>Please name your drawing.</h3>
+    <div class='save_text_block'>
+       <textarea id='filename' class='save_textarea' spellcheck='false'></textarea>
+       <div class='ext_tag'> .svg</div>
+    </div>
+    <h4 id="save_warning" class="save_warning"></h4>
+    <div class="save_modal_btn_row">
+       <button id="save_cancel_btn" class="cancel">Cancel</button>
+       <button id="save_ok_btn" class="ok">Ok</button>
+       <button id="save_confirm_btn" class="save_confirm_btn">Confirm</button>
+    </div>
+    `,
+    js: function (el) {
+      const revertState = () => {
+        document.getElementById("filename").value = "";
+        document.getElementById("save_warning").style.display = "none";
+        document.getElementById("save_confirm_btn").style.display = "none";
+        document.getElementById("save_ok_btn").style.display = "inherit";
+        $('#filename').prop('readonly', false);
+      };
+      el.querySelector("#save_cancel_btn").addEventListener("click", function () {
+        revertState();
+        editor.modal.cloudSave.close();
+      })
+      el.querySelector("#save_ok_btn").addEventListener("click", function () {
+        let filename = `${document.getElementById("filename").value}.svg`;
+        editor.saveBlock(filename).then(res => {
+          console.log(res);
+          if (res.status === 409) {
+            document.getElementById("save_warning").innerHTML = `${filename} already exists. Please click 'confirm' if you would like to overwrite it.`
+            document.getElementById("save_warning").style.display = "block";
+            document.getElementById("save_ok_btn").style.display = "none";
+            document.getElementById("save_confirm_btn").style.display = "block";
+            $('#filename').prop('readonly', true);
+          } else {
+            revertState();
+            editor.modal.cloudSave.close();
+          }
+        })
+      })
+      el.querySelector("#save_confirm_btn").addEventListener("click", function () {
+        filename = `${document.getElementById("filename").value}.svg`;
+        editor.saveBlock(filename, true).then(res => {
+          console.log("Overwrite...", filename)
+          revertState();
+          // document.getElementById("save_name").innerText = "";
+          // document.getElementById("tool_csave").classList.remove("disabled");
+          // document.getElementById("tool_cdel").classList.remove("disabled");
+          editor.modal.cloudSave.close();
+        })
+      })
     }
   }),
   configure: new MD.Modal({
@@ -59,9 +114,9 @@ editor.modal = {
         <button class="warning">Erase all data</button>
         </div>
       </div>`,
-    js: function(el){
+    js: function (el) {
       const input = el.querySelector("#configuration button.warning");
-      input.addEventListener("click", function(){
+      input.addEventListener("click", function () {
         state.clean();
       })
     }
@@ -78,10 +133,10 @@ editor.modal = {
     html: `
       <h1>Shortcuts</h1>
       <div id="shortcuts"></div>`,
-    js: function(el){
+    js: function (el) {
       el.children[0].classList.add("modal-item-wide");
     }
-  })
+  }),
 };
 
 editor.keyboard = new MD.Keyboard();
