@@ -24,7 +24,7 @@
           .then(json)
           .then((res) => {
             let drawings = res.map(
-              (drawing) => `<div class="open_drawing_item">${drawing.key}</div>`
+              (drawing) => `<div class="open_drawing_item">${drawing.name}</div>`
             );
             //   document.getElementById("open_drawing_list").innerHTML = drawings.join("");
             localStorage.setItem("drawings", drawings.join(""));
@@ -74,11 +74,14 @@
       },
       save_drawing: function (formData) {
         return api("POST", `./api/save`, formData)
-          .then(json)
-          .then((res) => window.api.app.list_drawings());
-      },
-      is_unique: function (name) {
-        return api("GET", `./api/unique/${name}`).then(json);
+          .then((res)=> {
+            if(!res.ok){
+              throw new Error("409 Conflict Error")
+            }
+            return res.json()
+          })
+          .then((ds) => window.api.app.list_drawings())
+          .catch((err)=> {throw err});
       },
       delete_drawing: function (name) {
         return api("DELETE", `./api/delete/${name}`).then(json);

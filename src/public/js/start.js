@@ -3,11 +3,6 @@ const svgCanvas = new $.SvgCanvas(document.getElementById("svgcanvas"));
 const editor = new MD.Editor();
 const state = new State();
 
-function getCookieValue(a) {
-	var b = document.cookie.match('(^|;)\\s*' + a + '\\s*=\\s*([^;]+)')
-	return b ? b.pop() : ''
-}
-
 editor.modal = {
   about: new MD.Modal({
     html: `
@@ -121,48 +116,7 @@ const shapeLib = svgCanvas.addExtension.apply(this, ["shapes", MD.Shapelib]);
 const eyedropper = svgCanvas.addExtension.apply(this, ["eyedropper", MD.Eyedropper]);
 state.set("canvasId", t("Untitled"));
 state.set("canvasMode", state.get("canvasMode"));
-const preloadSvg = new URLSearchParams(window.location.search).get("name");
-if (preloadSvg){
-  const url = `./bytes/${preloadSvg}`
-  fetch(url)
-  .then((res) => res.body)
-  .then((stream) => new Response(stream))
-  .then((response) => response.blob())
-  .then((blob) => blob)
-  .then((file) => {
-    var reader = new FileReader();
-    reader.readAsText(file);
-    reader.onload = function () {
-      svgCanvas.setSvgString(JSON.parse(reader.result));
-    };
-    reader.onerror = function () {
-      console.log(reader.error);
-    };
-
-  })
-  .catch((error) => {
-    console.log("Failed to open svg");
-  });
-} else {
-  svgCanvas.setSvgString(`<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
-<g id="Layer_1">
- <title>Layer 1</title>
-</g>
-</svg>`);
-editor.paintBox.fill.setPaint({
-  type: "solidColor",
-  solidColor: "ffffff",
-  alpha: 100,
-});
-editor.paintBox.stroke.setPaint({
-  type: "solidColor",
-  solidColor: "000000",
-  alpha: 100,
-});
-editor.paintBox.canvas.setPaint({
-  type: "solidColor",
-  solidColor: "ffffff",
-  alpha: 100,
-});
-}
-
+svgCanvas.setSvgString(state.get("canvasContent"));
+editor.paintBox.fill.setPaint(state.get("canvasFill"));
+editor.paintBox.stroke.setPaint(state.get("canvasStroke"));
+editor.paintBox.canvas.setPaint(state.get("canvasBackground"));

@@ -187,37 +187,38 @@ editor.modal = {
       })
       el.querySelector("#save_ok").addEventListener("click", function() {
         let filename = `${document.getElementById("filename").value}.svg`;
-        window.api.app.is_unique(filename).then(res=> {
-          if(res) {
-            editor.saveBlock(filename).then(res=> {
-              document.getElementById("tool_csave").classList.remove("disabled");
-              document.getElementById("tool_cdel").classList.remove("disabled");
-              editor.modal.save.close();
-              document.getElementById("save_name").innerText = filename;
-              document.getElementById("filename").value = ""
-            })
-
-          } else {
-            document.getElementById("save_warning").innerHTML = `${filename} already exists. Please click 'confirm' if you would like to override it.`
-            document.getElementById("save_warning").style.display = "block";
-            document.getElementById("save_ok").style.display = "none";
-            document.getElementById("confirm_save").style.display = "block";
-          }
+        editor.modal.save.close();
+        editor.modal.loading.open();
+        editor.saveBlock(filename, false).then(res=> {
+          document.getElementById("tool_csave").classList.remove("disabled");
+          document.getElementById("tool_cdel").classList.remove("disabled");
+          editor.modal.loading.close();
+          document.getElementById("save_name").innerText = filename;
+          document.getElementById("filename").value = ""
+        }).catch((err)=> {
+          editor.modal.loading.close();
+          editor.modal.save.open();
+          document.getElementById("save_warning").innerHTML = `${filename} already exists. Please click 'confirm' if you would like to override it.`
+          document.getElementById("save_warning").style.display = "block";
+          document.getElementById("save_ok").style.display = "none";
+          document.getElementById("confirm_save").style.display = "block";
         })
       })
       el.querySelector("#confirm_save").addEventListener("click", function() {
         filename = `${document.getElementById("filename").value}.svg`;
-        editor.saveBlock(filename).then(res=> {
-          console.log("Overwrite...", filename)
+        editor.modal.save.close();
+        editor.modal.loading.open();
+        editor.saveBlock(filename, true).then(res=> {
+          console.log("Overwrite...", res)
           document.getElementById("save_ok").style.display = "inherit";
           document.getElementById("save_warning").style.display = "none";
           document.getElementById("confirm_save").style.display = "none";
           document.getElementById("save_name").innerText = filename;
           document.getElementById("tool_csave").classList.remove("disabled");
           document.getElementById("tool_cdel").classList.remove("disabled");
-          editor.modal.save.close();
+          editor.modal.loading.close();
           document.getElementById("filename").value = ""
-        })
+        }).catch((err)=> console.log("Error"))
       })
     }
   }),
@@ -284,7 +285,9 @@ editor.modal = {
           editor.modal.open.close();
         } else {
           const filename = selected_div.innerText;
+          editor.modal.loading.open();
           await window.api.app.load_drawing(filename);
+          editor.modal.loading.close();
           editor.modal.open.close();
         }
       })
@@ -301,6 +304,9 @@ editor.modal = {
         drawings[i].addEventListener("click", onDrawingClick);
       }
     }
+  }),
+  loading: new MD.Modal({
+    html: `<h4>Loading</h4>`
   })
 };
 
@@ -359,3 +365,11 @@ editor.paintBox.canvas.setPaint({
   solidColor: "ffffff",
   alpha: 100,
 });
+if(!window.Location.hostname.contains("deta.dev")) {
+  document.getElementById("tool_copen").style.display = "none"
+document.getElementById("tool_csave").style.display = "none"
+document.getElementById("tool_csaveas").style.display = "none"
+document.getElementById("tool_cdel").style.display = "none"
+document.getElementById("save_name").style.display = "none"
+document.getElementById("share").style.display = "none"
+}

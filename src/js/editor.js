@@ -29,7 +29,7 @@ MD.Editor = function () {
     );
   }
 
-  async function saveBlock(name) {
+  async function saveBlock(name, overwrite) {
     editor.save_name = name;
     svgCanvas.clearSelection();
     const str = svgCanvas.svgCanvasToString();
@@ -37,8 +37,26 @@ MD.Editor = function () {
     const file = new File([blob], editor.save_name, { type: "image/svg_xml" });
     const formData = new FormData();
     formData.append("file", file);
-    await window.api.app.save_drawing(formData);
-    document.getElementById("save_name").innerText = editor.save_name;
+    formData.append("overwrite", overwrite);
+    return window.api.app.save_drawing(formData).then(res=> {
+      document.getElementById("save_name").innerText = editor.save_name;
+      window.api.app.load_drawing_metadata(name).then((res) => {
+        document.getElementById("public_toggle").checked =
+          res["public"];
+        if (document.getElementById("public_toggle").checked){
+            document.getElementById("share_links").style.display = "block";
+            document.getElementById("raw_url").value = `${window.location.hostname}/public/raw/${editor.save_name}`
+            document.getElementById("edit_url").value = `${window.location.hostname}/public/?name=${editor.save_name}`
+            document.getElementById("share_desc").innerHTML =
+            "Anyone with the link can view your work.";
+        } else {
+            document.getElementById("share_desc").innerHTML =
+            "Make your drawing public and share a link with anyone";
+            document.getElementById("share_links").style.display = "none";
+        }
+      });
+      return editor.save_name;
+    }).catch((err)=> {throw err})
   }
   function share() {
     editor.modal.share.open();
@@ -52,7 +70,11 @@ MD.Editor = function () {
     editor.modal.delete.open();
   }
   function cloudSave() {
-    saveBlock(editor.save_name).then((res) => console.log("File Saved!"));
+    editor.modal.loading.open();
+    saveBlock(editor.save_name, true).then((res) => {
+      console.log("File Saved!")
+      editor.modal.loading.close();
+    });
   }
   function cloudSaveAs() {
     editor.modal.save.open();
