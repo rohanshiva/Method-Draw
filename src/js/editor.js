@@ -387,6 +387,17 @@ MD.Editor = function () {
   }
   this.cloudOpen = cloudOpen;
 
+  function share() {
+  
+    if(window.deta.currOpen) {
+      editor.modal.share.open();
+    } else {
+      this.cloudSave();
+    }
+
+  }
+  this.share = share;
+
   function about() {
     editor.modal.about.open();
   }

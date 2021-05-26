@@ -23,6 +23,21 @@
         window.deta.currOpen = filename;
     }
 
+    const setShareStatus = (public) => {
+      console.log(public)
+      document.getElementById("public_toggle").checked = public;
+      if (public){
+        document.getElementById("share_links").style.display = "block";
+        document.getElementById("raw_url").value =  `${window.location.hostname}/public/raw/${window.deta.currOpen}`
+        document.getElementById("edit_url").value = `${window.location.hostname}/public/?name=${window.deta.currOpen}`
+        document.getElementById("share_desc").innerHTML =
+          "Anyone with the link can view your work.";
+      } else {
+        document.getElementById("share_desc").innerHTML =
+        "Make your drawing public and share a link with anyone";
+        document.getElementById("share_links").style.display = "none";
+      }
+    }
     const open = async () => {
         const filename = window.deta.toOpen.innerText;
         const response = await window.api.app.loadDrawing(filename);
@@ -31,15 +46,15 @@
             const bod = response.body;
             const stream = new Response(bod);
             const file = await stream.blob();
+            const drawing_metadata = await window.api.app.getMetadata(filename);
             const reader = new FileReader();
             reader.readAsText(file);
             reader.onload = function () {
                 svgCanvas.setSvgString(JSON.parse(reader.result));
                 // set name in the menu
-
-                // set share button in the menu
                 setOpen(filename);
-                // change share modal values
+                // set share button in the menu 
+                setShareStatus(drawing_metadata["public"]);
             };
             reader.onerror = function () {
                 console.log(reader.error);

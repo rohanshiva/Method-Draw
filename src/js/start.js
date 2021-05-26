@@ -7,6 +7,7 @@ const isDetaRuntime = location.hostname === "deta.app"
   || location.hostname === "deta.app"
   || location.hostname === "127.0.0.1";
 
+
 const detaMods = () => {
   // replace menu with Deta Options
   document.getElementById("file_menu_main").innerHTML =
@@ -27,6 +28,18 @@ const detaMods = () => {
     <div data-action="save" id="tool_save" class="menu_item">Export SVG <span class="shortcut">⌘S</span></div>
     <div data-action="export" id="tool_export" class="menu_item">Export as PNG</div>
   </div>`;
+
+  const menu = document.querySelector('#menu_bar');
+  const shareDiv = document.createElement("div");
+  shareDiv.setAttribute("class", "menu");
+  shareDiv.setAttribute("id", "share_drawing");
+  const shareDivTitle = document.createElement("div");
+  shareDivTitle.setAttribute("id", "share_drawing_title");
+  shareDivTitle.setAttribute("class", "menu_title");
+  shareDivTitle.setAttribute("onclick", "editor.share()");
+  shareDivTitle.innerText = `Share`;
+  shareDiv.appendChild(shareDivTitle);
+  menu.appendChild(shareDiv);
 }
 
 if (isDetaRuntime) detaMods();
@@ -163,6 +176,80 @@ editor.modal = {
         }
       });
     }
+  }),
+  share: new MD.Modal({
+    html: `
+    <div class="share-container">
+    <div class="share_info">
+      <h3>Share to web.</h3>
+      <p id="share_desc">Make your drawing public and share a link with anyone</p>
+    </div>
+    <div class="share_btn_grid">     
+      <label class="switch">
+      <input id="public_toggle" id="public_toggle" type="checkbox">
+      <span class="slider round"></span>
+      </label>
+    </div>
+    </div>
+    
+    <div id="share_links" class="share_links">
+      <h4>Raw SVG:</h4>
+      <div class="share_url">
+        <textarea spellcheck="false" class="url" id="raw_url">
+          https://deta.dev
+        </textarea>
+        <div class="copy" >
+          <div id="copy_raw"> 
+            Copy
+          </div>
+        </div>
+      </div>
+      <h4>Your SVG in Method Draw:</h4>
+      <div class="share_url">
+        <textarea spellcheck="false" class="url" id="edit_url">
+        https://deta.dev/edit
+        </textarea>
+        <div class="copy">
+          <div id="copy_edit">
+          Copy
+          </div>
+        <div>
+      </div>
+    </div>
+    `,
+    js: function (el) {
+      el.querySelector("#public_toggle").addEventListener(
+        "change",
+        async function () {
+          const isPublic = document.getElementById("public_toggle");
+          if (isPublic.checked) {
+            const res = await window.api.app.togglePublic(window.deta.currOpen, isPublic.checked);
+            document.getElementById("share_links").style.display = "block";
+            document.getElementById("raw_url").value =  `${window.location.hostname}/public/raw/${window.deta.currOpen}`
+            document.getElementById("edit_url").value = `${window.location.hostname}/public/?name=${window.deta.currOpen}`
+            document.getElementById("share_desc").innerHTML =
+              "Anyone with the link can view your work.";
+          } else {
+            const res = await window.api.app.togglePublic(window.deta.currOpen, isPublic.checked);
+            document.getElementById("share_desc").innerHTML =
+              "Make your drawing public and share a link with anyone";
+            document.getElementById("share_links").style.display = "none";
+          }
+        }
+      );
+      el.querySelector("#copy_raw").addEventListener("click", function() {
+        const raw_url = document.getElementById("raw_url")
+        raw_url.select();
+        raw_url.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+      })
+      el.querySelector("#copy_edit").addEventListener("click", function() {
+        const edit_url = document.getElementById("edit_url")
+        edit_url.select();
+        edit_url.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+      })
+    },
   }),
   configure: new MD.Modal({
     html: `

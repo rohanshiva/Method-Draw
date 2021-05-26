@@ -4,7 +4,7 @@ from fastapi import HTTPException
 import urllib
 import base64
 
-deta = Deta("a0zgsbqm_bdhbNUzmPiHtY46DWeW1cyAuDhPYe2FN")
+deta = Deta("")
 
 
 def get_base():
@@ -26,7 +26,6 @@ def get_all(db, query):
 def get_drawings():
     return get_all(base, {})
 
-
 # save
 def save(name, file, overwrite):
     encoded_name = str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
@@ -39,7 +38,6 @@ def save(name, file, overwrite):
     else:  # Overwrite False and Record Exists
         return None
 
-
 def get_drawing(name):
     encoded_name = str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
     b = base.get(encoded_name)
@@ -48,4 +46,27 @@ def get_drawing(name):
         return d.read()
     base.delete(encoded_name)
     drive.delete(name)
+    return None
+
+def toggle_public(name, public):
+    encoded_name = str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
+    b = base.get(encoded_name)
+    if (b):
+        b["public"] = public
+        return base.put(b)
+    return None
+
+def get_metadata(name):
+    encoded_name = str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
+    b = base.get(encoded_name)
+    if(b):
+        return b
+    return None
+
+def raw_drawing(name):
+    encoded_name =  str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
+    b = base.get(encoded_name)
+
+    if (b and b["public"]):
+        return drive.get(name)
     return None

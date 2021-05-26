@@ -65,7 +65,7 @@ MD.Menu = function(){
       blink(this);
     }
   });
-
+  
   $("body").on('mousedown', close);
 
   this.flash = flash;

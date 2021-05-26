@@ -8,15 +8,6 @@ from state import *
 import os
 
 
-deta = Deta("a0zgsbqm_bdhbNUzmPiHtY46DWeW1cyAuDhPYe2FN")
-
-def get_base():
-    return deta.Base("drawings")
-
-base = get_base()
-
-drive = deta.Drive("drawings")
-
 app = FastAPI()
 
 class Drawing(BaseModel):
@@ -49,6 +40,20 @@ def get_drawing_handler(name: str):
         return drawing
     raise HTTPException(status_code=404, detail="Drawing doesn't exist")
 
+@app.get("/api/metadata/{name}")
+def get_metadata_handler(name: str):
+    drawing = get_metadata(name)
+    if drawing:
+        return drawing
+    raise HTTPException(status_code=404, detail="Drawing doesn't exist")
+
+@app.put("/api/public/{name}")
+def toggle_public_handler(name: str, drawing: Drawing):
+    drawing = toggle_public(name, drawing.public)
+    if drawing:
+        return drawing
+    raise HTTPException(status_code=404, detail="Drawing doesn't exist")
+
 @app.post("/api/save")
 def upload_img(file: UploadFile = File(...), overwrite: bool = Form(False)):
     name = file.filename
@@ -60,6 +65,14 @@ def upload_img(file: UploadFile = File(...), overwrite: bool = Form(False)):
     else:
         raise HTTPException(status_code=409, detail="Drawing already exists")
 
+# public route
+@app.get("/public/raw/{name}")
+def stream_drawing(name: str):
+    drawing = raw_drawing(name)
+    if drawing:
+        return StreamingResponse(drawing.iter_chunks(1024), media_type="image/svg+xml")
+    else:
+        return FileResponse("./404.html")
 
 app.mount("/public", StaticFiles(directory=".", html="true"), name="static")
 app.mount("/", StaticFiles(directory=".", html="true"), name="static")

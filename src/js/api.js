@@ -31,6 +31,14 @@
             loadDrawing: function (name) {
                 const resp = api("GET", `./api/drawings/${name}`);
                 return resp;
+            },
+            getMetadata: function (name) {
+                const resp = api("GET", `./api/metadata/${name}`).then(json)
+                return resp;
+            },
+            togglePublic: function (name, public_status) {
+                const resp = api("PUT", `./api/public/${name}`, JSON.stringify({public: public_status}));
+                return resp;
             }
         },
     };
