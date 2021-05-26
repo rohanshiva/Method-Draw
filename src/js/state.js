@@ -6,7 +6,7 @@ function State(){
   const ID = window.location.pathname;
 
   this.data = _loadData();
-  
+  this.selected_div = null;
   this.set = (key, val) => {
     key = key.split("-")[0] || key;
     if (tenThousandThings.indexOf(key) === -1) return console.warn( key + " not implemented");

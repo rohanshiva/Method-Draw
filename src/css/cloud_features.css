@@ -1,0 +1,70 @@
+/* modals */
+
+/* /* save as to deta */
+
+.save_text_block {
+  display: flex;
+  align-items: flex-end;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.save_textarea {
+  border-radius: var(--x1);
+  border: 2px solid var(--d9);
+  height: 2rem;
+  width: 200px;
+  white-space: nowrap;
+  font-size: 1.5rem;
+  overflow-x: scroll;
+  resize: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.save_warning {
+  display: none;
+  max-width: 250px;
+  color: var(--a6);
+}
+
+.save_modal_btn_row {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--x2) var(--x2);
+}
+
+.save_confirm_btn {
+  display: none;
+  background-color: var(--c6);
+}
+
+.save_confirm_btn:hover {
+  background-color: var(--c8);
+}
+
+/* open */
+.open_drawing_list {
+  border-style: solid;
+  border-width: unset;
+  border-color: var(--d9);
+  margin-bottom: 2rem;
+  height: 10rem;
+  overflow-y: auto;
+}
+.open_drawing_item {
+  padding: 0.5rem;
+}
+.open_drawing_item:hover {
+  background-color: var(--d15);
+}
+
+.delete_drawing_btn{
+  background-color: var(--a6)
+}

@@ -20,9 +20,33 @@ MD.Editor = function(){
       editor.paintBox.fill.prep();
       editor.paintBox.stroke.prep();
       svgCanvas.runExtensions('onNewDocument');
+      this.save_name = undefined;
+      document.getElementById("save_name").innerHTML = "untitled.svg";
+      document.getElementById("tool_cdelete").classList.add("disabled");
     });
   }
+  function cloudSave() {
+    if (editor.save_name) {
+      window.api.app.save_drawing(editor.save_name).then(res=> {
+        console.log(res);
+      })
+    } else {
+      this.cloudSaveAs();
+    }
 
+  }
+  function cloudSaveAs() {
+    editor.modal.cloudSaveAs.open();
+  }
+  function cloudOpen() {
+    console.log("cloud open list...")
+    window.api.app.list_drawings().then(res=> {
+      editor.modal.cloudOpen.open();
+    })
+  }
+  function cloudDelete() {
+    editor.modal.cloudDelete.open();
+  }
   function save(){
     _self.menu.flash($('#file_menu'));
     svgCanvas.save();
@@ -352,6 +376,12 @@ MD.Editor = function(){
   this.undo = undo;
   this.redo = redo;
   this.clear = clear;
+  //deta stuff
+  this.cloudSave = cloudSave;
+  this.cloudSaveAs = cloudSaveAs;
+  this.cloudOpen = cloudOpen;
+  this.cloudDelete = cloudDelete;
+  this.save_name = undefined;
   this.duplicateSelected = duplicateSelected;
   this.deleteSelected = deleteSelected;
   this.cutSelected = cutSelected;
