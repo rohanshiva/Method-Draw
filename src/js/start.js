@@ -117,6 +117,7 @@ editor.modal = {
             document.getElementById("save_confirm_btn").style.display = "block";
             $('#filename').prop('readonly', true);
           } else {
+            window.deta.setOpen(filename);
             editor.modal.cloudSave.close();
             revertState();
           }

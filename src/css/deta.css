@@ -86,3 +86,8 @@
     color: var(--z1);
     background-color: var(--d15);
 }
+
+.curr_open_drawing {
+    cursor: default !important;
+    background-color: transparent !important;
+}
