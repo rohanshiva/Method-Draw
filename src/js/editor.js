@@ -363,12 +363,12 @@ MD.Editor = function () {
       var onDrawingClick = function () {
         this.style.backgroundColor = "var(--d15)";
         this.style.fontWeight = "bold";
-        const lastSelect = window.drawingToOpenFromDeta;
+        const lastSelect = window.deta.toOpen;
         if (lastSelect !== null) {
           lastSelect.style.backgroundColor = "white";
           lastSelect.style.fontWeight = "normal";
         }
-        window.drawingToOpenFromDeta = this;
+        window.deta.toOpen = this;
       }
 
       for (var i = 0; i < drawings.length; i++) {

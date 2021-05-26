@@ -147,26 +147,21 @@ editor.modal = {
     </div>
     `,
     js: function (el) {
-      window.drawingToOpenFromDeta = null;
+      window.deta.toOpen = null;
       el.querySelector("#open_cancel").addEventListener("click", function () {
         editor.modal.cloudOpen.close();
       });
       el.querySelector("#open_ok").addEventListener("click", function () {
-        if (window.drawingToOpenFromDeta == null) {
+        if (window.deta.toOpen == null) {
           editor.modal.cloudOpen.close();
         } else {
-          const filename = window.drawingToOpenFromDeta.innerText;
           // load the drawing
-          window.api.app.load_drawing(filename).then((res) => {
-            document
-              .getElementById("tool_cdelete")
-              .classList.remove("disabled");
+          window.deta.open();
 
-            editor.modal.cloudOpen.close();
-          });
+          editor.modal.cloudOpen.close();
         }
       });
-    },
+    }
   }),
   configure: new MD.Modal({
     html: `

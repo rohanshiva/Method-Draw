@@ -30,10 +30,24 @@ def get_all(db, query):
             blobs.append(blob)
     return blobs
 
+@app.middleware('http')
+async def add_no_cache(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path == "/":
+        response.headers["Cache-control"] = "no-store"
+    return response
+
 @app.get("/api/drawings")
 def get_drawings_handler():
     drawings = get_drawings()
     return drawings
+
+@app.get("/api/drawings/{name}")
+def get_drawing_handler(name: str):
+    drawing = get_drawing(name)
+    if drawing:
+        return drawing
+    raise HTTPException(status_code=404, detail="Drawing doesn't exist")
 
 @app.post("/api/save")
 def upload_img(file: UploadFile = File(...), overwrite: bool = Form(False)):

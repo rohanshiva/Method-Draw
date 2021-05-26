@@ -31,11 +31,21 @@ def get_drawings():
 def save(name, file, overwrite):
     encoded_name = str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
     b = base.get(encoded_name)
+    record = {"key": encoded_name, "name":name, "public": False, 'lastModified': datetime.utcnow().timestamp()}
     if (overwrite or not b): # Overwrite allowed or Record Does not Exist
-        base.put({"key": encoded_name, "name":name, "public": False, 'lastModified': datetime.utcnow().timestamp()})
+        base.put(record)
         drive.put(name, file)
-        return True
+        return record
     else:  # Overwrite False and Record Exists
-        return False
+        return None
 
 
+def get_drawing(name):
+    encoded_name = str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
+    b = base.get(encoded_name)
+    d = drive.get(name)
+    if (b and d):
+        return d.read()
+    base.delete(encoded_name)
+    drive.delete(name)
+    return None

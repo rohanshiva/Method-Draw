@@ -27,6 +27,10 @@
             saveDrawing: function (formData) {
                 const resp = api("POST", `./api/save`, formData);
                 return resp;
+            },
+            loadDrawing: function (name) {
+                const resp = api("GET", `./api/drawings/${name}`);
+                return resp;
             }
         },
     };
