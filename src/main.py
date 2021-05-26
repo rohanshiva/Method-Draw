@@ -4,12 +4,17 @@ from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse,
 from deta import Deta
 from pydantic import BaseModel
 from datetime import datetime
-from util import get_all
+from state import *
 import os
 
 
 deta = Deta("a0zgsbqm_bdhbNUzmPiHtY46DWeW1cyAuDhPYe2FN")
-base = deta.Base("drawings")
+
+def get_base():
+    return deta.Base("drawings")
+
+base = get_base()
+
 drive = deta.Drive("drawings")
 
 app = FastAPI()
@@ -25,95 +30,22 @@ def get_all(db, query):
             blobs.append(blob)
     return blobs
 
+@app.get("/api/drawings")
+def get_drawings_handler():
+    drawings = get_drawings()
+    return drawings
+
 @app.post("/api/save")
 def upload_img(file: UploadFile = File(...), overwrite: bool = Form(False)):
     name = file.filename
     f = file.file
     # base and drive fix logic, unique names
-    b = base.get(name)
-    d = drive.get(name)
-    """
-    if (d):
-        base.put({'key':name, 'public': d["public"], 'lastModified': datetime.utcnow().timestamp()})
-    """
-    if ((b or d) and not overwrite):
-        raise HTTPException(status_code=409, detail="Drawing already exists")
+    success = save(name, f, overwrite)
+    if success:
+        return {"message": "success"}
     else:
-        base.put({'key': name, 'public': False, 'lastModified': datetime.utcnow().timestamp()})
-        res = drive.put(name, f)
-    return {"message": "success"}
+        raise HTTPException(status_code=409, detail="Drawing already exists")
 
-@app.get("/api/drawings")
-def get_drawings():
-    return get_all(base, {})
-
-@app.get("/api/{name}")
-def get_drawing(name: str):
-    b = base.get(name)
-    d = drive.get(name)
-    if (b and d):
-        return d.read()
-    base.delete(name)
-    drive.delete(name)
-    raise HTTPException(status_code=404, detail="Drawing not found")
-
-@app.get("/api/metadata/{name}")
-def get_metadata(name: str):
-    b = base.get(name)
-    if(b):
-        return b
-    raise HTTPException(status_code=404, detail="Drawing not found")
-
-@app.delete("/api/delete/{name}", status_code=200)
-def delete_drawing(name: str):
-    b = base.delete(name)
-    d = drive.delete(name)
-    return
-
-@app.get("/api/unique/{name}")
-def is_unique(name: str):
-    b = base.get(name)
-    d = drive.get(name)
-    if (b and d):
-        return False
-    return True
-
-@app.put("/api/public/{name}", status_code=200)
-def toggle_public(name: str, drawing: Drawing):
-    res = base.get(name)
-    if (res):
-        res["public"] = drawing.public
-        base.put(res)
-        return
-    raise HTTPException(status_code=401, detail="Image doesn't exist")
-
-# @public
-@app.get("/public/raw/{name}")
-def get_raw_link(name: str):
-    res = base.get(name)
-    if (res and res["public"]):
-        img = drive.get(name)
-        return StreamingResponse(img.iter_chunks(1024), media_type="image/svg+xml")
-    return FileResponse("./404.html")
-
-# @public
-@app.get("/public/bytes/{name}")
-def get_img_data(name:str):
-    res = base.get(name)
-    if (res and res["public"]):
-        img = drive.get(name)
-        return img.read()
-    raise HTTPException(status_code=404, detail="Drawing not found")
-
-# @public
-@app.get("/public/")
-def get_edit_link(name: str = None):
-    if (name):
-        res = base.get(name)
-        if(res and res["public"]):
-            response = FileResponse("public/index.html")
-            return response
-    return FileResponse("public/index.html")
 
 app.mount("/public", StaticFiles(directory=".", html="true"), name="static")
 app.mount("/", StaticFiles(directory=".", html="true"), name="static")

@@ -329,7 +329,7 @@ MD.Editor = function () {
 
   async function saveBlock(name, overwrite = false) {
     // editor.save_name = name;
-    svgCanvas.clearSelection();
+    svgCanvas.clearSelection(); // what does this do?
     const str = svgCanvas.svgCanvasToString();
     const blob = new Blob([str], { type: "image/svg+xml" });
     const file = new File([blob], name, { type: "image/svg_xml" });
@@ -342,6 +342,47 @@ MD.Editor = function () {
     // document.getElementById("save_name").innerText = editor.save_name;
   }
   this.saveBlock = saveBlock;
+
+  async function cloudOpen() {
+    const response = await window.api.app.listDrawings();
+    if (response.status === 200) {
+      const drawings = await response.json();
+      drawings.sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        }
+        if (a.name > b.name) {
+          return 1;
+        }
+        return 0;
+      });
+
+      const openList = document.querySelector('#drawing_list');
+      openList.textContent = "";
+
+      var onDrawingClick = function () {
+        this.style.backgroundColor = "var(--d15)";
+        this.style.fontWeight = "bold";
+        const lastSelect = window.drawingToOpenFromDeta;
+        if (lastSelect !== null) {
+          lastSelect.style.backgroundColor = "white";
+          lastSelect.style.fontWeight = "normal";
+        }
+        window.drawingToOpenFromDeta = this;
+      }
+
+      for (var i = 0; i < drawings.length; i++) {
+        const newNode = document.createElement("a");
+        newNode.setAttribute("id", drawings[i].key);
+        newNode.setAttribute("class", "open_drawing_item");
+        newNode.addEventListener("click", onDrawingClick);
+        newNode.textContent = drawings[i].name;
+        openList.appendChild(newNode);
+      }
+    }
+    editor.modal.cloudOpen.open();
+  }
+  this.cloudOpen = cloudOpen;
 
   function about() {
     editor.modal.about.open();

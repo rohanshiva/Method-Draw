@@ -14,6 +14,7 @@ const detaMods = () => {
   <div class="menu_title">File</div>
   <div class="menu_list" id="file_menu">
     <div data-action="clear" id="tool_clear" class="menu_item">New Document</div>
+    <div data-action="cloudOpen" id="tool_copen" class="menu_item">Open Document</div>
     <div data-action="cloudSave" id="tool_csaveas" class="menu_item">Save As<span class="shortcut">⌘S</span>
     </div>
     <div id="tool_open" class="menu_item">
@@ -87,7 +88,7 @@ editor.modal = {
        <div class='ext_tag'> .svg</div>
     </div>
     <h4 id="save_warning" class="save_warning"></h4>
-    <div class="save_modal_btn_row">
+    <div class="modal_btn_row">
        <button id="save_cancel_btn" class="cancel">Cancel</button>
        <button id="save_ok_btn" class="ok">Ok</button>
        <button id="save_confirm_btn" class="save_confirm_btn">Confirm</button>
@@ -133,6 +134,39 @@ editor.modal = {
         })
       })
     }
+  }),
+  cloudOpen: new MD.Modal({
+    html: `
+    <div class="open_title">Please select an svg to open:</div>
+    <div id="drawing_list" class="open_drawing_list">
+      Loading drawings...
+    </div>
+    <div class="modal_btn_row">
+      <button id="open_cancel" class="cancel">Cancel</button>
+      <button id="open_ok" class="open">Ok</button>
+    </div>
+    `,
+    js: function (el) {
+      window.drawingToOpenFromDeta = null;
+      el.querySelector("#open_cancel").addEventListener("click", function () {
+        editor.modal.cloudOpen.close();
+      });
+      el.querySelector("#open_ok").addEventListener("click", function () {
+        if (window.drawingToOpenFromDeta == null) {
+          editor.modal.cloudOpen.close();
+        } else {
+          const filename = window.drawingToOpenFromDeta.innerText;
+          // load the drawing
+          window.api.app.load_drawing(filename).then((res) => {
+            document
+              .getElementById("tool_cdelete")
+              .classList.remove("disabled");
+
+            editor.modal.cloudOpen.close();
+          });
+        }
+      });
+    },
   }),
   configure: new MD.Modal({
     html: `
