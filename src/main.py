@@ -81,22 +81,16 @@ def delete_drawing_handler(name: str):
 @app.put("/api/public/{name}")
 def modify_public_handler(name: str, drawing: Drawing):
     did_toggle = modify_public(name, drawing.public)
-    print(did_toggle)
     if did_toggle:
         return {"message": "success"}
     else:
         raise HTTPException(status_code=502, detail="Internal server error")
 
-app.mount("/", StaticFiles(directory=".", html="true"), name="static")
-
-#public routes
-
-# drawing data
-@app.get("/public/bytes/{name}")
-def public_bytes_handler(name: str):
-    drawing = get_public_drawing(name)
-    if drawing: 
-        return drawing.read()
+@app.get("/api/metadata/{name}")
+def metadata_handler(name:str):
+    drawing = get_metadata(name)
+    if drawing:
+        return drawing
     else:
         raise HTTPException(status_code=502, detail="Internal server error")
 
@@ -108,5 +102,18 @@ def stream_drawing(name: str):
     else:
         return FileResponse("./404.html")
 
+@app.get("/public/bytes/{name}")
+def public_bytes_handler(name: str):
+    drawing = get_public_drawing(name)
+    if drawing: 
+        return drawing.read()
+    else:
+        raise HTTPException(status_code=502, detail="Internal server error")
+
 
 app.mount("/public", StaticFiles(directory=".", html="true"), name="static")
+app.mount("/", StaticFiles(directory=".", html="true"), name="static")
+
+
+
+

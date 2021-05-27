@@ -1,11 +1,16 @@
-const isDetaRuntime = location.hostname === "deta.app"
-  || location.hostname === "deta.dev"
-  || location.hostname === "127.0.0.1";
+const isDetaRuntime =
+  location.hostname === "deta.app" ||
+  location.hostname === "deta.dev" ||
+  location.hostname === "127.0.0.1";
+
+const urlParams = new URLSearchParams(window.location.search);
+const paths = window.location.pathname.split("/");
+const isPublic = paths[1] === "public" && paths[2] !== "raw";
+const publicSvgName = urlParams.get("name");
 
 const detaMenuMods = () => {
   // replace menu with Deta Options
-  document.getElementById("file_menu_main").innerHTML =
-    `
+  document.getElementById("file_menu_main").innerHTML = `
       <div class="menu_title">File</div>
       <div class="menu_list" id="file_menu">
         <div data-action="clear" id="tool_clear" class="menu_item">New Document</div>
@@ -38,8 +43,8 @@ const detaMenuMods = () => {
   shareDivTitle.innerText = `Share`;
   shareDiv.appendChild(shareDivTitle);
   menu.appendChild(shareDiv);
-}
+};
 
-if (isDetaRuntime) {
+if (isDetaRuntime && !isPublic) {
   detaMenuMods();
 }
