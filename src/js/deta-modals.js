@@ -141,11 +141,11 @@ const detaModals = {
         }
     }),
 
-    cloudError: new MD.Modal({
+    cloudSaveError: new MD.Modal({
         html: `
         <div class="modal_header">Save Error</div>
         <div id="cloud_error" class="cloud_error">
-          There was an error saving to the cloud. Please try again.
+          There was an error saving to the cloud. Please try again, and download any work to prevent data loss.
         </div>
         <div class="modal_btn_row">
           <button id="error_btn" class="cancel">Close</button>
@@ -156,7 +156,67 @@ const detaModals = {
 
             b1.addEventListener("click", function () {
                 b1.blur();
-                editor.modal.cloudError.close();
+                editor.modal.cloudSaveError.close();
+            });
+        }
+    }),
+
+    cloudOpenError: new MD.Modal({
+        html: `
+        <div class="modal_header">Open Drawing Error</div>
+        <div id="cloud_open_error" class="cloud_error">
+          There was an error while opening the drawing. Please try again.
+        </div>
+        <div class="modal_btn_row">
+          <button id="error_open_btn" class="cancel">Close</button>
+        </div>
+        `,
+        js: function (el) {
+            const b1 = el.querySelector("#error_open_btn");
+
+            b1.addEventListener("click", function () {
+                b1.blur();
+                editor.modal.cloudOpenError.close();
+            });
+        }
+    }),
+
+    cloudDeleteError: new MD.Modal({
+        html: `
+        <div class="modal_header">Delete Drawing Error</div>
+        <div id="cloud_delete_error" class="cloud_error">
+          There was an error while deleting the drawing. Please try again, and make sure to save any unsaved work.
+        </div>
+        <div class="modal_btn_row">
+          <button id="error_delete_btn" class="cancel">Close</button>
+        </div>
+        `,
+        js: function (el) {
+            const b1 = el.querySelector("#error_delete_btn");
+
+            b1.addEventListener("click", function () {
+                b1.blur();
+                editor.modal.cloudDeleteError.close();
+            });
+        }
+    }),
+    
+    shareError: new MD.Modal({
+        html: `
+        <div class="modal_header">Share Drawing Error</div>
+        <div id="share_error" class="cloud_error">
+          There was an error while making the drawing public. Please try again, and make sure to save any unsaved work.
+        </div>
+        <div class="modal_btn_row">
+          <button id="share_error_btn" class="cancel">Close</button>
+        </div>
+        `,
+        js: function(el) {
+            const b1 = el.querySelector("#share_error_btn");
+
+            b1.addEventListener("click", function () {
+                b1.blur();
+                editor.modal.shareError.close();
             });
         }
     }),

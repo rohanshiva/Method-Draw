@@ -212,7 +212,9 @@
                 console.log(reader.error);
             };
         } else {
-
+            editor.modal.cloudOpenError.open();
+            setStatus("ERROR");
+            return null;
         }
     }
 
@@ -223,6 +225,8 @@
             clearCanvas();
             return 200;
         } else {
+            editor.modal.cloudDeleteError.open();
+            setStatus("ERROR");
             return null;
         }
 
@@ -248,7 +252,7 @@
             setStatus("SAVED");
             return response;
         } else {
-            editor.modal.cloudError.open();
+            editor.modal.cloudSaveError.open();
             setStatus("ERROR");
             return null;
         }
