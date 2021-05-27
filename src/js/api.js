@@ -39,6 +39,10 @@
             togglePublic: function (name, public_status) {
                 const resp = api("PUT", `./api/public/${name}`, JSON.stringify({public: public_status}));
                 return resp;
+            },
+            loadPublicDrawing: function(name) {
+                const resp = api("GET", `/public/bytes/${name}`);
+                return resp;
             }
         },
     };

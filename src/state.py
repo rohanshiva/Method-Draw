@@ -1,17 +1,9 @@
 from deta import Deta
 from datetime import date, datetime
-from fastapi import HTTPException
-import urllib
 import base64
 
 deta = Deta("")
-
-
-def get_base():
-    return deta.Base("drawings")
-
-base = get_base()
-
+base = deta.Base("drawings")
 drive = deta.Drive("drawings")
 
 def get_all(db, query):
@@ -26,8 +18,8 @@ def get_all(db, query):
 def get_drawings():
     return get_all(base, {})
 
-# save
-def save(name, file, overwrite):
+# save as
+def save_as(name, file, overwrite):
     encoded_name = str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
     b = base.get(encoded_name)
     record = {"key": encoded_name, "name":name, "public": False, 'lastModified': datetime.utcnow().timestamp()}
@@ -37,6 +29,14 @@ def save(name, file, overwrite):
         return record
     else:  # Overwrite False and Record Exists
         return None
+
+def save(name, file):
+    encoded_name = str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
+    b = base.get(encoded_name)
+    if (b):
+        base.update({"public": b["public"]}, encoded_name)
+        return drive.put(name, file)
+    return None
 
 def get_drawing(name):
     encoded_name = str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
@@ -63,10 +63,19 @@ def get_metadata(name):
         return b
     return None
 
-def raw_drawing(name):
-    encoded_name =  str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
+def get_public_drawing(name):
+    encoded_name = str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
     b = base.get(encoded_name)
-
     if (b and b["public"]):
         return drive.get(name)
     return None
+
+def delete_drawing(name):
+    encoded_name =  str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
+    try:
+        base.delete(encoded_name)
+        drive.delete(name)
+        return name
+    except:
+        return None
+

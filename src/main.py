@@ -10,6 +10,10 @@ import os
 
 app = FastAPI()
 
+deta = Deta("")
+base = deta.Base("drawings")
+drive = deta.Drive("drawings")
+
 class Drawing(BaseModel):
     public: bool = False
 
@@ -59,7 +63,7 @@ def upload_img(file: UploadFile = File(...), overwrite: bool = Form(False)):
     name = file.filename
     f = file.file
     # base and drive fix logic, unique names
-    success = save(name, f, overwrite)
+    success = save_as(name, f, overwrite)
     if success:
         return {"message": "success"}
     else:
@@ -68,11 +72,21 @@ def upload_img(file: UploadFile = File(...), overwrite: bool = Form(False)):
 # public route
 @app.get("/public/raw/{name}")
 def stream_drawing(name: str):
-    drawing = raw_drawing(name)
+    drawing = get_public_drawing(name)
     if drawing:
         return StreamingResponse(drawing.iter_chunks(1024), media_type="image/svg+xml")
     else:
         return FileResponse("./404.html")
+
+@app.get("/public/bytes/{name}")
+def public_drawing(name):
+    encoded_name = str(base64.urlsafe_b64encode(name.encode("utf-8")), 'utf-8')
+    b = base.get(encoded_name)
+    if (b and b["public"]):
+        return drive.get(name).read()
+    raise HTTPException(status_code=404)
+# app.get( /public/?svg=dhsjghdjs&state=public)
+# render index.html
 
 app.mount("/public", StaticFiles(directory=".", html="true"), name="static")
 app.mount("/", StaticFiles(directory=".", html="true"), name="static")

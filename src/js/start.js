@@ -3,15 +3,18 @@ const svgCanvas = new $.SvgCanvas(document.getElementById("svgcanvas"));
 const editor = new MD.Editor();
 const state = new State();
 
-const isDetaRuntime = location.hostname === "deta.app"
-  || location.hostname === "deta.app"
-  || location.hostname === "127.0.0.1";
+const isDetaRuntime =
+  location.hostname === "deta.app" ||
+  location.hostname === "deta.app" ||
+  location.hostname === "127.0.0.1";
 
+const urlParams = new URLSearchParams(window.location.search);
+const isPublic = urlParams.get("state") === "public";
+const publicSvgName = urlParams.get("name");
 
 const detaMods = () => {
   // replace menu with Deta Options
-  document.getElementById("file_menu_main").innerHTML =
-    `
+  document.getElementById("file_menu_main").innerHTML = `
   <div class="menu_title">File</div>
   <div class="menu_list" id="file_menu">
     <div data-action="clear" id="tool_clear" class="menu_item">New Document</div>
@@ -29,7 +32,7 @@ const detaMods = () => {
     <div data-action="export" id="tool_export" class="menu_item">Export as PNG</div>
   </div>`;
 
-  const menu = document.querySelector('#menu_bar');
+  const menu = document.querySelector("#menu_bar");
   const shareDiv = document.createElement("div");
   shareDiv.setAttribute("class", "menu");
   shareDiv.setAttribute("id", "share_drawing");
@@ -40,248 +43,368 @@ const detaMods = () => {
   shareDivTitle.innerText = `Share`;
   shareDiv.appendChild(shareDivTitle);
   menu.appendChild(shareDiv);
-}
 
-if (isDetaRuntime) detaMods();
-
-editor.modal = {
-  about: new MD.Modal({
-    html: `
-      <h1>About this application</h1>
-      <p>Method Draw is a simple <a href="https://github.com/methodofaction/Method-Draw">open source</a> vector drawing application. Method Draw was forked from <a href="https://github.com/SVG-Edit/svgedit">SVG-Edit</a> several years ago with the goal of improving and modernizing the interface.</p>
-      <p>At this time (2021), the author (<a href="http://method.ac/writing">Mark MacKay</a>) is working on improving stability and improving the codebase, which contains a lot of legacy practices. The goal is to create a vector editor suitable for simple graphic design tasks.</p>
-      `
-  }),
-  source: new MD.Modal({
-    html: `
-      <div id="svg_source_editor">
-        <div id="svg_source_overlay" class="overlay"></div>
-        <div id="svg_source_container">
-          <form>
-            <textarea id="svg_source_textarea" spellcheck="false"></textarea>
-          </form>
-          <div id="tool_source_back" class="toolbar_button">
-            <button id="tool_source_cancel" class="cancel">Cancel</button>
-            <button id="tool_source_save" class="ok">Apply Changes</button>
+  editor.modal = {
+    about: new MD.Modal({
+      html: `
+        <h1>About this application</h1>
+        <p>Method Draw is a simple <a href="https://github.com/methodofaction/Method-Draw">open source</a> vector drawing application. Method Draw was forked from <a href="https://github.com/SVG-Edit/svgedit">SVG-Edit</a> several years ago with the goal of improving and modernizing the interface.</p>
+        <p>At this time (2021), the author (<a href="http://method.ac/writing">Mark MacKay</a>) is working on improving stability and improving the codebase, which contains a lot of legacy practices. The goal is to create a vector editor suitable for simple graphic design tasks.</p>
+        `,
+    }),
+    source: new MD.Modal({
+      html: `
+        <div id="svg_source_editor">
+          <div id="svg_source_overlay" class="overlay"></div>
+          <div id="svg_source_container">
+            <form>
+              <textarea id="svg_source_textarea" spellcheck="false"></textarea>
+            </form>
+            <div id="tool_source_back" class="toolbar_button">
+              <button id="tool_source_cancel" class="cancel">Cancel</button>
+              <button id="tool_source_save" class="ok">Apply Changes</button>
+            </div>
           </div>
-        </div>
-    </div>`,
-    js: function (el) {
-      el.children[0].classList.add("modal-item-source");
-      el.querySelector("#tool_source_save").addEventListener("click", function () {
-        var saveChanges = function () {
-          svgCanvas.clearSelection();
-          $('#svg_source_textarea').blur();
-          editor.zoom.multiply(1);
-          editor.rulers.update();
-          editor.paintBox.fill.prep();
-          editor.paintBox.stroke.prep();
-          editor.modal.source.close();
-        }
+      </div>`,
+      js: function (el) {
+        el.children[0].classList.add("modal-item-source");
+        el.querySelector("#tool_source_save").addEventListener(
+          "click",
+          function () {
+            var saveChanges = function () {
+              svgCanvas.clearSelection();
+              $("#svg_source_textarea").blur();
+              editor.zoom.multiply(1);
+              editor.rulers.update();
+              editor.paintBox.fill.prep();
+              editor.paintBox.stroke.prep();
+              editor.modal.source.close();
+            };
 
-        if (!svgCanvas.setSvgString($('#svg_source_textarea').val())) {
-          $.confirm("There were parsing errors in your SVG source.\nRevert back to original SVG source?", function (ok) {
-            if (!ok) return false;
-            saveChanges();
-          });
-        } else {
-          saveChanges();
-        }
-      })
-      el.querySelector("#tool_source_cancel").addEventListener("click", function () {
-        editor.modal.source.close();
-      });
-    }
-  }),
-  // deta modals
-  cloudSave: new MD.Modal({
-    html: `<h3>Please name your drawing.</h3>
-    <div class='save_text_block'>
-       <textarea id='filename' class='save_textarea' spellcheck='false'></textarea>
-       <div class='ext_tag'> .svg</div>
-    </div>
-    <h4 id="save_warning" class="save_warning"></h4>
-    <div class="modal_btn_row">
-       <button id="save_cancel_btn" class="cancel">Cancel</button>
-       <button id="save_ok_btn" class="ok">Ok</button>
-       <button id="save_confirm_btn" class="save_confirm_btn">Confirm</button>
-    </div>
-    `,
-    js: function (el) {
-      const revertState = () => {
-        document.getElementById("filename").value = "";
-        document.getElementById("save_warning").style.display = "none";
-        document.getElementById("save_confirm_btn").style.display = "none";
-        document.getElementById("save_ok_btn").style.display = "inherit";
-        $('#filename').prop('readonly', false);
-      };
-      el.querySelector("#save_cancel_btn").addEventListener("click", function () {
-        editor.modal.cloudSave.close();
-        revertState();
-      })
-      el.querySelector("#save_ok_btn").addEventListener("click", function () {
-        let filename = `${document.getElementById("filename").value}.svg`;
-        editor.saveBlock(filename).then(res => {
-          console.log(res);
-          if (res.status === 409) {
-            document.getElementById("save_warning").innerHTML = `${filename} already exists. Please click 'confirm' if you would like to overwrite it.`
-            document.getElementById("save_warning").style.display = "block";
-            document.getElementById("save_ok_btn").style.display = "none";
-            document.getElementById("save_confirm_btn").style.display = "block";
-            $('#filename').prop('readonly', true);
-          } else {
-            window.deta.setOpen(filename);
+            if (!svgCanvas.setSvgString($("#svg_source_textarea").val())) {
+              $.confirm(
+                "There were parsing errors in your SVG source.\nRevert back to original SVG source?",
+                function (ok) {
+                  if (!ok) return false;
+                  saveChanges();
+                }
+              );
+            } else {
+              saveChanges();
+            }
+          }
+        );
+        el.querySelector("#tool_source_cancel").addEventListener(
+          "click",
+          function () {
+            editor.modal.source.close();
+          }
+        );
+      },
+    }),
+    // deta modals
+    cloudSave: new MD.Modal({
+      html: `<h3>Please name your drawing.</h3>
+      <div class='save_text_block'>
+         <textarea id='filename' class='save_textarea' spellcheck='false'></textarea>
+         <div class='ext_tag'> .svg</div>
+      </div>
+      <h4 id="save_warning" class="save_warning"></h4>
+      <div class="modal_btn_row">
+         <button id="save_cancel_btn" class="cancel">Cancel</button>
+         <button id="save_ok_btn" class="ok">Ok</button>
+         <button id="save_confirm_btn" class="save_confirm_btn">Confirm</button>
+      </div>
+      `,
+      js: function (el) {
+        const revertState = () => {
+          document.getElementById("filename").value = "";
+          document.getElementById("save_warning").style.display = "none";
+          document.getElementById("save_confirm_btn").style.display = "none";
+          document.getElementById("save_ok_btn").style.display = "inherit";
+          $("#filename").prop("readonly", false);
+        };
+        el.querySelector("#save_cancel_btn").addEventListener(
+          "click",
+          function () {
             editor.modal.cloudSave.close();
             revertState();
           }
-        })
-      })
-      el.querySelector("#save_confirm_btn").addEventListener("click", function () {
-        filename = `${document.getElementById("filename").value}.svg`;
-        editor.saveBlock(filename, true).then(res => {
-          console.log("Overwrite...", filename)
-          revertState();
-          // document.getElementById("save_name").innerText = "";
-          // document.getElementById("tool_csave").classList.remove("disabled");
-          // document.getElementById("tool_cdel").classList.remove("disabled");
-          editor.modal.cloudSave.close();
-        })
-      })
-    }
-  }),
-  cloudOpen: new MD.Modal({
-    html: `
-    <div class="open_title">Please select an svg to open:</div>
-    <div id="drawing_list" class="open_drawing_list">
-      Loading drawings...
-    </div>
-    <div class="modal_btn_row">
-      <button id="open_cancel" class="cancel">Cancel</button>
-      <button id="open_ok" class="open">Ok</button>
-    </div>
-    `,
-    js: function (el) {
-      window.deta.toOpen = null;
-      el.querySelector("#open_cancel").addEventListener("click", function () {
-        editor.modal.cloudOpen.close();
-      });
-      el.querySelector("#open_ok").addEventListener("click", function () {
-        if (window.deta.toOpen == null) {
-          editor.modal.cloudOpen.close();
-        } else {
-          // load the drawing
-          window.deta.open();
-
-          editor.modal.cloudOpen.close();
-        }
-      });
-    }
-  }),
-  share: new MD.Modal({
-    html: `
-    <div class="share-container">
-    <div class="share_info">
-      <h3>Share to web.</h3>
-      <p id="share_desc">Make your drawing public and share a link with anyone</p>
-    </div>
-    <div class="share_btn_grid">     
-      <label class="switch">
-      <input id="public_toggle" id="public_toggle" type="checkbox">
-      <span class="slider round"></span>
-      </label>
-    </div>
-    </div>
-    
-    <div id="share_links" class="share_links">
-      <h4>Raw SVG:</h4>
-      <div class="share_url">
-        <textarea spellcheck="false" class="url" id="raw_url">
-          https://deta.dev
-        </textarea>
-        <div class="copy" >
-          <div id="copy_raw"> 
-            Copy
-          </div>
-        </div>
-      </div>
-      <h4>Your SVG in Method Draw:</h4>
-      <div class="share_url">
-        <textarea spellcheck="false" class="url" id="edit_url">
-        https://deta.dev/edit
-        </textarea>
-        <div class="copy">
-          <div id="copy_edit">
-          Copy
-          </div>
-        <div>
-      </div>
-    </div>
-    `,
-    js: function (el) {
-      el.querySelector("#public_toggle").addEventListener(
-        "change",
-        async function () {
-          const isPublic = document.getElementById("public_toggle");
-          if (isPublic.checked) {
-            const res = await window.api.app.togglePublic(window.deta.currOpen, isPublic.checked);
-            document.getElementById("share_links").style.display = "block";
-            document.getElementById("raw_url").value =  `${window.location.hostname}/public/raw/${window.deta.currOpen}`
-            document.getElementById("edit_url").value = `${window.location.hostname}/public/?name=${window.deta.currOpen}`
-            document.getElementById("share_desc").innerHTML =
-              "Anyone with the link can view your work.";
-          } else {
-            const res = await window.api.app.togglePublic(window.deta.currOpen, isPublic.checked);
-            document.getElementById("share_desc").innerHTML =
-              "Make your drawing public and share a link with anyone";
-            document.getElementById("share_links").style.display = "none";
+        );
+        el.querySelector("#save_ok_btn").addEventListener("click", function () {
+          let filename = `${document.getElementById("filename").value}.svg`;
+          editor.saveBlock(filename).then((res) => {
+            console.log(res);
+            if (res.status === 409) {
+              document.getElementById(
+                "save_warning"
+              ).innerHTML = `${filename} already exists. Please click 'confirm' if you would like to overwrite it.`;
+              document.getElementById("save_warning").style.display = "block";
+              document.getElementById("save_ok_btn").style.display = "none";
+              document.getElementById("save_confirm_btn").style.display =
+                "block";
+              $("#filename").prop("readonly", true);
+            } else {
+              window.deta.setOpen(filename);
+              editor.modal.cloudSave.close();
+              revertState();
+            }
+          });
+        });
+        el.querySelector("#save_confirm_btn").addEventListener(
+          "click",
+          function () {
+            filename = `${document.getElementById("filename").value}.svg`;
+            editor.saveBlock(filename, true).then((res) => {
+              console.log("Overwrite...", filename);
+              revertState();
+              // document.getElementById("save_name").innerText = "";
+              // document.getElementById("tool_csave").classList.remove("disabled");
+              // document.getElementById("tool_cdel").classList.remove("disabled");
+              editor.modal.cloudSave.close();
+            });
           }
-        }
-      );
-      el.querySelector("#copy_raw").addEventListener("click", function() {
-        const raw_url = document.getElementById("raw_url")
-        raw_url.select();
-        raw_url.setSelectionRange(0, 99999);
-        document.execCommand("copy");
-      })
-      el.querySelector("#copy_edit").addEventListener("click", function() {
-        const edit_url = document.getElementById("edit_url")
-        edit_url.select();
-        edit_url.setSelectionRange(0, 99999);
-        document.execCommand("copy");
-      })
-    },
-  }),
-  configure: new MD.Modal({
-    html: `
-      <h1>Configuration</h1>
-      <div id="configuration">
-        <button class="warning">Erase all data</button>
+        );
+      },
+    }),
+    cloudOpen: new MD.Modal({
+      html: `
+      <div class="open_title">Please select an svg to open:</div>
+      <div id="drawing_list" class="open_drawing_list">
+        Loading drawings...
+      </div>
+      <div class="modal_btn_row">
+        <button id="open_cancel" class="cancel">Cancel</button>
+        <button id="open_ok" class="open">Ok</button>
+      </div>
+      `,
+      js: function (el) {
+        window.deta.toOpen = null;
+        el.querySelector("#open_cancel").addEventListener("click", function () {
+          editor.modal.cloudOpen.close();
+        });
+        el.querySelector("#open_ok").addEventListener("click", function () {
+          if (window.deta.toOpen == null) {
+            editor.modal.cloudOpen.close();
+          } else {
+            // load the drawing
+            window.deta.open();
+
+            editor.modal.cloudOpen.close();
+          }
+        });
+      },
+    }),
+    share: new MD.Modal({
+      html: `
+      <div class="share-container">
+      <div class="share_info">
+        <h3>Share to web.</h3>
+        <p id="share_desc">Make your drawing public and share a link with anyone</p>
+      </div>
+      <div class="share_btn_grid">     
+        <label class="switch">
+        <input id="public_toggle" id="public_toggle" type="checkbox">
+        <span class="slider round"></span>
+        </label>
+      </div>
+      </div>
+      
+      <div id="share_links" class="share_links">
+        <h4>Raw SVG:</h4>
+        <div class="share_url">
+          <textarea spellcheck="false" class="url" id="raw_url">
+            https://deta.dev
+          </textarea>
+          <div class="copy" >
+            <div id="copy_raw"> 
+              Copy
+            </div>
+          </div>
         </div>
-      </div>`,
-    js: function (el) {
-      const input = el.querySelector("#configuration button.warning");
-      input.addEventListener("click", function () {
-        state.clean();
-      })
-    }
-  }),
-  donate: new MD.Modal({
-    html: `
-      <h1>Donate</h1>
-      <p>
-        Method Draw relies on your generous donations for continued development.
-        <a href="https://method.ac/donate/">Donate now</a> if you find this application useful.
-      </p>`
-  }),
-  shortcuts: new MD.Modal({
-    html: `
-      <h1>Shortcuts</h1>
-      <div id="shortcuts"></div>`,
-    js: function (el) {
-      el.children[0].classList.add("modal-item-wide");
-    }
-  }),
+        <h4>Your SVG in Method Draw:</h4>
+        <div class="share_url">
+          <textarea spellcheck="false" class="url" id="edit_url">
+          https://deta.dev/edit
+          </textarea>
+          <div class="copy">
+            <div id="copy_edit">
+            Copy
+            </div>
+          <div>
+        </div>
+      </div>
+      `,
+      js: function (el) {
+        el.querySelector("#public_toggle").addEventListener(
+          "change",
+          async function () {
+            const isPublic = document.getElementById("public_toggle");
+            if (isPublic.checked) {
+              const res = await window.api.app.togglePublic(
+                window.deta.currOpen,
+                isPublic.checked
+              );
+              document.getElementById("share_links").style.display = "block";
+              document.getElementById(
+                "raw_url"
+              ).value = `${window.location.hostname}/public/raw/${window.deta.currOpen}`;
+              document.getElementById(
+                "edit_url"
+              ).value = `${window.location.hostname}/public/?name=${window.deta.currOpen}`;
+              document.getElementById("share_desc").innerHTML =
+                "Anyone with the link can view your work.";
+            } else {
+              const res = await window.api.app.togglePublic(
+                window.deta.currOpen,
+                isPublic.checked
+              );
+              document.getElementById("share_desc").innerHTML =
+                "Make your drawing public and share a link with anyone";
+              document.getElementById("share_links").style.display = "none";
+            }
+          }
+        );
+        el.querySelector("#copy_raw").addEventListener("click", function () {
+          const raw_url = document.getElementById("raw_url");
+          raw_url.select();
+          raw_url.setSelectionRange(0, 99999);
+          document.execCommand("copy");
+        });
+        el.querySelector("#copy_edit").addEventListener("click", function () {
+          const edit_url = document.getElementById("edit_url");
+          edit_url.select();
+          edit_url.setSelectionRange(0, 99999);
+          document.execCommand("copy");
+        });
+      },
+    }),
+    configure: new MD.Modal({
+      html: `
+        <h1>Configuration</h1>
+        <div id="configuration">
+          <button class="warning">Erase all data</button>
+          </div>
+        </div>`,
+      js: function (el) {
+        const input = el.querySelector("#configuration button.warning");
+        input.addEventListener("click", function () {
+          state.clean();
+        });
+      },
+    }),
+    donate: new MD.Modal({
+      html: `
+        <h1>Donate</h1>
+        <p>
+          Method Draw relies on your generous donations for continued development.
+          <a href="https://method.ac/donate/">Donate now</a> if you find this application useful.
+        </p>`,
+    }),
+    shortcuts: new MD.Modal({
+      html: `
+        <h1>Shortcuts</h1>
+        <div id="shortcuts"></div>`,
+      js: function (el) {
+        el.children[0].classList.add("modal-item-wide");
+      },
+    }),
+  };
 };
+
+if (isDetaRuntime && !isPublic) {
+  detaMods();
+} else {
+  editor.modal = {
+    about: new MD.Modal({
+      html: `
+        <h1>About this application</h1>
+        <p>Method Draw is a simple <a href="https://github.com/methodofaction/Method-Draw">open source</a> vector drawing application. Method Draw was forked from <a href="https://github.com/SVG-Edit/svgedit">SVG-Edit</a> several years ago with the goal of improving and modernizing the interface.</p>
+        <p>At this time (2021), the author (<a href="http://method.ac/writing">Mark MacKay</a>) is working on improving stability and improving the codebase, which contains a lot of legacy practices. The goal is to create a vector editor suitable for simple graphic design tasks.</p>
+        `,
+    }),
+    source: new MD.Modal({
+      html: `
+        <div id="svg_source_editor">
+          <div id="svg_source_overlay" class="overlay"></div>
+          <div id="svg_source_container">
+            <form>
+              <textarea id="svg_source_textarea" spellcheck="false"></textarea>
+            </form>
+            <div id="tool_source_back" class="toolbar_button">
+              <button id="tool_source_cancel" class="cancel">Cancel</button>
+              <button id="tool_source_save" class="ok">Apply Changes</button>
+            </div>
+          </div>
+      </div>`,
+      js: function (el) {
+        el.children[0].classList.add("modal-item-source");
+        el.querySelector("#tool_source_save").addEventListener(
+          "click",
+          function () {
+            var saveChanges = function () {
+              svgCanvas.clearSelection();
+              $("#svg_source_textarea").blur();
+              editor.zoom.multiply(1);
+              editor.rulers.update();
+              editor.paintBox.fill.prep();
+              editor.paintBox.stroke.prep();
+              editor.modal.source.close();
+            };
+
+            if (!svgCanvas.setSvgString($("#svg_source_textarea").val())) {
+              $.confirm(
+                "There were parsing errors in your SVG source.\nRevert back to original SVG source?",
+                function (ok) {
+                  if (!ok) return false;
+                  saveChanges();
+                }
+              );
+            } else {
+              saveChanges();
+            }
+          }
+        );
+        el.querySelector("#tool_source_cancel").addEventListener(
+          "click",
+          function () {
+            editor.modal.source.close();
+          }
+        );
+      },
+    }),
+    configure: new MD.Modal({
+      html: `
+        <h1>Configuration</h1>
+        <div id="configuration">
+          <button class="warning">Erase all data</button>
+          </div>
+        </div>`,
+      js: function (el) {
+        const input = el.querySelector("#configuration button.warning");
+        input.addEventListener("click", function () {
+          state.clean();
+        });
+      },
+    }),
+    donate: new MD.Modal({
+      html: `
+        <h1>Donate</h1>
+        <p>
+          Method Draw relies on your generous donations for continued development.
+          <a href="https://method.ac/donate/">Donate now</a> if you find this application useful.
+        </p>`,
+    }),
+    shortcuts: new MD.Modal({
+      html: `
+        <h1>Shortcuts</h1>
+        <div id="shortcuts"></div>`,
+      js: function (el) {
+        el.children[0].classList.add("modal-item-wide");
+      },
+    }),
+  };
+}
 
 editor.keyboard = new MD.Keyboard();
 editor.menu = new MD.Menu();
@@ -292,9 +415,9 @@ editor.text = new MD.Text();
 editor.panel = new MD.Panel();
 editor.zoom = new MD.Zoom();
 editor.paintBox = {
-  fill: new MD.PaintBox('#fill_color', 'fill'),
-  stroke: new MD.PaintBox('#stroke_color', 'stroke'),
-  canvas: new MD.PaintBox('#canvas_color', 'canvas')
+  fill: new MD.PaintBox("#fill_color", "fill"),
+  stroke: new MD.PaintBox("#stroke_color", "stroke"),
+  canvas: new MD.PaintBox("#canvas_color", "canvas"),
 };
 editor.palette = new MD.Palette();
 editor.pan = new MD.Pan();
@@ -312,10 +435,38 @@ svgCanvas.bind("contextset", editor.contextChanged);
 svgCanvas.bind("extension_added", editor.extensionAdded);
 svgCanvas.textActions.setInputElem($("#text")[0]);
 const shapeLib = svgCanvas.addExtension.apply(this, ["shapes", MD.Shapelib]);
-const eyedropper = svgCanvas.addExtension.apply(this, ["eyedropper", MD.Eyedropper]);
+const eyedropper = svgCanvas.addExtension.apply(this, [
+  "eyedropper",
+  MD.Eyedropper,
+]);
 state.set("canvasId", t("Untitled"));
 state.set("canvasMode", state.get("canvasMode"));
-svgCanvas.setSvgString(state.get("canvasContent"));
+
+if (publicSvgName) {
+  const loadDrawing = async () => {
+    const response = await window.api.app.loadPublicDrawing(publicSvgName);
+    if (response.status === 200) {
+      const bod = response.body;
+      const stream = new Response(bod);
+      const file = await stream.blob();
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = function () {
+        svgCanvas.setSvgString(JSON.parse(reader.result));
+      };
+      reader.onerror = function () {
+        console.log(reader.error);
+      };
+    } else {
+      svgCanvas.setSvgString(state.get("canvasContent"));
+
+    }
+  }
+  loadDrawing();
+} else {
+  svgCanvas.setSvgString(state.get("canvasContent"));
+}
+
 editor.paintBox.fill.setPaint(state.get("canvasFill"));
 editor.paintBox.stroke.setPaint(state.get("canvasStroke"));
 editor.paintBox.canvas.setPaint(state.get("canvasBackground"));
